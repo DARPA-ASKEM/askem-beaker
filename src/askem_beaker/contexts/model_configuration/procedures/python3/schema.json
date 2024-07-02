@@ -1,0 +1,164 @@
+{
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "default": "Default Name"
+      },
+      "description": {
+        "type": "string",
+        "default": "Default Description"
+      },
+      "fileNames": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "temporary": {
+        "type": "boolean"
+      },
+      "publicAsset": {
+        "type": "boolean"
+      },
+      "calibrationRunId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "modelId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "simulationId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "observableSemanticList": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string",
+              "enum": [
+                "initial",
+                "parameter",
+                "observable"
+              ]
+            },
+            "referenceId": {
+              "type": "string"
+            },
+            "states": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "expression": {
+              "type": "string"
+            },
+            "expressionMathml": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "parameterSemanticList": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string",
+              "enum": [
+                "initial",
+                "parameter",
+                "observable"
+              ]
+            },
+            "referenceId": {
+              "type": "string"
+            },
+            "distribution": {
+              "type": "object",
+              "properties": {
+                "additionalProperties": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "object"
+                  },
+                  "writeOnly": true
+                },
+                "type": {
+                  "type": "string"
+                },
+                "parameters": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "interventions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "timestep": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "value": {
+                    "type": "number",
+                    "format": "double"
+                  }
+                }
+              }
+            },
+            "default": {
+              "type": "boolean"
+            }
+          }
+        }
+      },
+      "initialSemanticList": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string",
+              "enum": [
+                "initial",
+                "parameter",
+                "observable"
+              ]
+            },
+            "target": {
+              "type": "string"
+            },
+            "expression": {
+              "type": "string"
+            },
+            "expressionMathml": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }

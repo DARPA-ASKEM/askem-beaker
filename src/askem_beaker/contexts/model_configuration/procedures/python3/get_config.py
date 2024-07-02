@@ -1,0 +1,1 @@
+{{ var_name|default("model_config") }}
