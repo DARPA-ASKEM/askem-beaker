@@ -6,7 +6,7 @@ nav_order: 1
 has_toc: true
 ---
 
-# mira_config_edit
+# model_configuration
 
 This context is used for editing model configurations in Terarium's new JSON style. On setup it expects a model configuration `id` to be provided; unlike other contexts the key is always `id` and the value is the model configuration `id`. For example:
 
