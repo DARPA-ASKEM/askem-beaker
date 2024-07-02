@@ -26,33 +26,6 @@ class ConfigEditAgent(BaseAgent):
     def __init__(self, context: BaseContext = None, tools: list = None, **kwargs):
         super().__init__(context, tools, **kwargs)
 
-#     @tool()
-#     async def describe_configuration(
-#         self, query: str, agent: AgentRef, loop: LoopControllerRef
-#     ) -> None:
-#         """
-#         This tool is used to answer questions about the model configuration. It fetches the model configuration for analysis.
-
-#         Input is a full grammatically correct question about or request for an action to be performed on the loaded model configuration.
-
-#         Args:
-#             query (str): A fully grammatically correct question about the current model configuration.
-
-#         """
-# #         prompt = f"""
-# # You are a scientific assistant helping answer questions about a model configuration.
-
-# # Model configurations are defined by a specific model configuration JSON schema and are JSON objects themselves.
-
-# # The current configuration is:
-# # {agent.context.model_config}
-
-# # Please analyze the configuration and answer the user's question.
-# # """       
-#         code = agent.context.get_code("load_config")
-#         model_config = await agent.context.evaluate(code)
-#         return model_config
-
     @tool()
     async def generate_code(
         self, query: str, agent: AgentRef, loop: LoopControllerRef
