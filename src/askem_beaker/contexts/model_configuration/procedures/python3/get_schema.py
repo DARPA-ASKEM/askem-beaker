@@ -3,7 +3,7 @@ import json
 import os
 
 # Fetch the Swagger spec
-url = f"{os.environ['HMI_SERVER_URL']}/v3/api-docs"
+url = f"{{ HMI_SERVER_URL }}/v3/api-docs"
 response = requests.get(url)
 swagger_spec = response.json()
 

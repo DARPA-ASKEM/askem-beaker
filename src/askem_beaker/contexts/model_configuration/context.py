@@ -75,7 +75,7 @@ in a Jupyter notebook using the '{self.subkernel.KERNEL_NAME}' kernel.
             str: a JSON representation of the model configuration schema
         """
         schema = (
-            await self.evaluate(self.get_code("get_schema"))
+            await self.evaluate(self.get_code("get_schema", {"HMI_SERVER_URL": os.environ["HMI_SERVER_URL"]}))
         )["return"]
         return json.dumps(schema, indent=2)
 
