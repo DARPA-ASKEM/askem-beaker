@@ -246,15 +246,14 @@ Statistics:
         logger.error(f"new dataset: {pprint.pformat(create_req.json())}")
 
         new_dataset["id"] = new_dataset_id
-        new_dataset_url = f"{dataservice_url}/datasets/{new_dataset_id}"
-        data_url_req = requests.get(f"{new_dataset_url}/upload-url?filename={filename}", auth=self.auth.requests_auth())
-        data_url = data_url_req.json().get('url', None)
 
         code = self.get_code(
-            "df_save_as",
+            "df_create_csv_dataset",
             {
                 "var_name": var_name,
-                "data_url": data_url,
+                "id": new_dataset_id,
+                "auth": self.get_auth(),
+                "filename": filename
             }
         )
         df_response = await self.execute(code)

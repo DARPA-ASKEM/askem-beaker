@@ -138,9 +138,11 @@ class PyCIEMSSContext(BaseContext):
         data_url_req = requests.get(f"{dataset_url}/upload-url?filename=result.csv", auth=auth)
         data_url = data_url_req.json().get('url', None)
         code = self.get_code(
-            "df_save_as",
+            "df_create_csv_dataset",
             {
-                "data_url": data_url,
+                "id": dataset_id,
+                "auth": self.get_auth(),
+                "filename": "result.csv"
             }
         )
         kernel_response = await self.execute(code) # TODO: Check error
