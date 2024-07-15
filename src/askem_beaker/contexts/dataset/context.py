@@ -254,7 +254,8 @@ Statistics:
                 "id": new_dataset_id,
                 "username": self.auth.username,
                 "password": self.auth.password,
-                "filename": filename
+                "filename": filename,
+                "dataservice_url": dataservice_url
             }
         )
         df_response = await self.execute(code)

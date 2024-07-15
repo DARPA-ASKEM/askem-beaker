@@ -7,8 +7,8 @@ from json import JSONDecodeError
 with tempfile.TemporaryFile() as temp_csv_file:
     {{ var_name|default("df") }}.to_csv(temp_csv_file, index=False, header=True)
     temp_csv_file.seek(0)
-    # Get the HMI_SERVER endpoint and auth token from the environment variable
-    hmi_server = os.getenv('HMI_SERVER_URL')
+    # Set the HMI_SERVER endpoint
+    hmi_server = "{{dataservice_url}}"
 
     # Define the id and filename dynamically
     id = "{{id}}"
