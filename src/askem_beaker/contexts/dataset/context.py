@@ -248,11 +248,12 @@ Statistics:
         new_dataset["id"] = new_dataset_id
 
         code = self.get_code(
-            "df_create_csv_dataset",
+            "hmi_create_csv_dataset",
             {
                 "var_name": var_name,
                 "id": new_dataset_id,
-                "auth": self.get_auth(),
+                "username": self.auth.username,
+                "password": self.auth.password,
                 "filename": filename
             }
         )

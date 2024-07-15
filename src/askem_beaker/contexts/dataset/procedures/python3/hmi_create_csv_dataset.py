@@ -23,7 +23,7 @@ with tempfile.TemporaryFile() as temp_csv_file:
 
     # Make the HTTP PUT request to upload the file bytes
     url = f'{hmi_server}/datasets/{id}/upload-csv'
-    response = requests.put(url, data=payload, files=files, auth={{auth}})
+    response = requests.put(url, data=payload, files=files, auth=("{{username}}", "{{password}}"))
 
     # Check the response status code
     if response.status_code < 300:
