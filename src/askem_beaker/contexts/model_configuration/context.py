@@ -119,6 +119,15 @@ in a Jupyter notebook using the '{self.subkernel.KERNEL_NAME}' kernel.
         print(f"Running command:\n-------\n{command}\n---------")
         await self.execute(command)        
 
+    async def post_execute(self, message):
+        try:
+            content = (await self.evaluate(self.get_code("get_config")))["return"]
+            self.beaker_kernel.send_response(
+                "iopub", "model_configuration_preview", content, parent_header=message.parent_header
+            )
+        except Exception as e:
+            raise
+
     @intercept()
     async def save_model_config_request(self, message):
         '''
