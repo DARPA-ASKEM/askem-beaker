@@ -127,7 +127,7 @@ workflows:
               only: /.*/
       - create-manifest:
           requires:
-            - build-light
+            - build-push-light
           filters:
             branches:
               only: main
