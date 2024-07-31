@@ -30,6 +30,25 @@ commands:
               sleep 1
             done
 
+  tag-generator:
+    description: Format CIRCLE_TAG
+    outputs:
+      tag: ${{ steps.generate.outputs.tag }}
+    steps:
+      - run: Generate appropriate tag
+        command: |
+          if [ -n "${CIRCLE_TAG}" ]; then
+            SEMVER=$( echo ${CIRCLE_TAG} | sed -nre 's/^v[^0-9]*(([0-9]+\.)*[0-9]+(-[a-z]+)?).*/\1/p')
+            if [[ -n $SEMVER ]]; then
+              IMAGE_TAG=${SEMVER}
+            else
+              IMAGE_TAG=${CIRCLE_TAG}
+            fi
+          else
+            IMAGE_TAG=latest
+          fi
+          export IMAGE_TAG
+
 jobs:
   build-light:
     parameters:
@@ -38,10 +57,14 @@ jobs:
     executor: << parameters.platform >>
     steps:
       - checkout
+      - setup_remote_docker
+      - configure-ghcr
+      - tag-generator
       - run:
           name: "Light Build"
           command: |
-            export VERSION=${CIRCLE_TAG:-latest}-${EXECUTOR}
+            export VERSION=${IMAGE_TAG}-${EXECUTOR}
+            echo "Building image: ${VERSION}"
             docker build -f Dockerfile.light -t askem-beaker .
             docker push ghcr.io/darpa-askem/beaker-kernel:${VERSION}
 
@@ -54,10 +77,12 @@ jobs:
       - checkout
       - setup_remote_docker
       - configure-ghcr
+      - tag-generator
       - run:
           name: "Full Build"
           command: |
-            export VERSION=${CIRCLE_TAG:-latest}-${EXECUTOR}
+            export VERSION=${IMAGE_TAG}-${EXECUTOR}
+            echo "Building image: ${VERSION}"
             docker build -f Dockerfile.full -t askem-beaker .
             docker push ghcr.io/darpa-askem/beaker-kernel:${VERSION}
 
@@ -68,15 +93,16 @@ jobs:
       - checkout
       - setup_remote_docker
       - configure-ghcr
+      - tag-generator
       - run:
           name: Create and push manifest for multiarch
           command: |
-            export VERSION=${CIRCLE_TAG:-latest}
+            echo "Creating manifest for image: ${IMAGE_TAG}"
             docker manifest create \
-            ghcr.io/darpa-askem/beaker-kernel:${VERSION} \
-            --amend ghcr.io/darpa-askem/beaker-kernel:${VERSION}-amd64 \
-            --amend ghcr.io/darpa-askem/beaker-kernel:${VERSION}-arm64
-            docker manifest push ghcr.io/darpa-askem/beaker-kernel:${VERSION}
+            ghcr.io/darpa-askem/beaker-kernel:${IMAGE_TAG} \
+            --amend ghcr.io/darpa-askem/beaker-kernel:${IMAGE_TAG}-amd64 \
+            --amend ghcr.io/darpa-askem/beaker-kernel:${IMAGE_TAG}-arm64
+            docker manifest push ghcr.io/darpa-askem/beaker-kernel:${IMAGE_TAG}
 
 workflows:
   build-publish:
