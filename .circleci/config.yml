@@ -30,17 +30,6 @@ commands:
               sleep 1
             done
 
-  environment-generator:
-    description: Generate env variables for the build
-    steps:
-      - run:
-          name: Generate build variables
-          command: |
-            echo "export DOCKER_REGISTRY=ghcr.io" >> $BASH_ENV
-            echo "export DOCKER_ORG=darpa-askem" >> $BASH_ENV
-            echo "export PACKAGE_NAME=beaker-kernel" >> $BASH_ENV
-            source $BASH_ENV
-
   tag-generator:
     description: Format CIRCLE_TAG
     steps:
@@ -58,7 +47,10 @@ commands:
               IMAGE_TAG=latest
             fi
             
-            echo "export IMAGE_TAG=${IMAGE_TAG}" >> $BASH_ENV
+            echo -e "export DOCKER_REGISTRY=ghcr.io\n" >> $BASH_ENV
+            echo -e "export DOCKER_ORG=darpa-askem\n" >> $BASH_ENV
+            echo -e "export PACKAGE_NAME=beaker-kernel\n" >> $BASH_ENV
+            echo -e "export IMAGE_TAG=${IMAGE_TAG}\n" >> $BASH_ENV
             source $BASH_ENV
 
 jobs:
@@ -71,13 +63,12 @@ jobs:
       - checkout
       - setup_remote_docker
       - configure-ghcr
-      - environment-generator
       - tag-generator
       - run:
           name: "Light Build"
           command: |
             export VERSION=${IMAGE_TAG}-${EXECUTOR}
-            echo "Building image: ${VERSION}"
+            echo "Building image: ${DOCKER_REGISTRY}/${DOCKER_ORG}/${PACKAGE_NAME}:${VERSION}"
             docker build -f Dockerfile.light -t ${DOCKER_REGISTRY}/${DOCKER_ORG}/${PACKAGE_NAME}:${VERSION} .
             docker push ${DOCKER_REGISTRY}/${DOCKER_ORG}/${PACKAGE_NAME}:${VERSION}
 
@@ -90,13 +81,12 @@ jobs:
       - checkout
       - setup_remote_docker
       - configure-ghcr
-      - environment-generator
       - tag-generator
       - run:
           name: "Full Build"
           command: |
             export VERSION=${IMAGE_TAG}-${EXECUTOR}
-            echo "Building image: ${VERSION}"
+            echo "Building image: ${DOCKER_REGISTRY}/${DOCKER_ORG}/${PACKAGE_NAME}:${VERSION}"
             docker build -f Dockerfile.full -t ${DOCKER_REGISTRY}/${DOCKER_ORG}/${PACKAGE_NAME}:${VERSION} .
             docker push ${DOCKER_REGISTRY}/${DOCKER_ORG}/${PACKAGE_NAME}:${VERSION}
 
@@ -107,12 +97,11 @@ jobs:
       - checkout
       - setup_remote_docker
       - configure-ghcr
-      - environment-generator
       - tag-generator
       - run:
           name: Create and push manifest for multiarch
           command: |
-            echo "Creating manifest for image: ${IMAGE_TAG}"
+            echo "Creating manifest for image: ${DOCKER_REGISTRY}/${DOCKER_ORG}/${PACKAGE_NAME}:${IMAGE_TAG}"
             docker manifest create \
             ${DOCKER_REGISTRY}/${DOCKER_ORG}/${PACKAGE_NAME}:${IMAGE_TAG} \
             --amend ${DOCKER_REGISTRY}/${DOCKER_ORG}/${PACKAGE_NAME}:${IMAGE_TAG}-amd64 \
