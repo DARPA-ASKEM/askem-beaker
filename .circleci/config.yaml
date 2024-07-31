@@ -52,6 +52,7 @@ jobs:
     executor: << parameters.platform >>
     steps:
       - checkout
+      - setup_remote_docker
       - run:
           name: "Full Build"
           command: |
@@ -77,6 +78,19 @@ jobs:
             docker manifest push ghcr.io/darpa-askem/beaker-kernel:${VERSION}
 
 workflows:
-  publish:
+  build-publish:
     jobs:
-      - build-light
+      build-light:
+        filters:
+          branches:
+            only: main
+          tags:
+            only: /.*/
+      publish:
+        requires:
+          - build-light
+        filters:
+          branches:
+            only: main
+          tags:
+            only: /.*/
