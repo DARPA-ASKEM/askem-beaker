@@ -1,0 +1,82 @@
+version: 2.1
+
+executors:
+  amd64:
+    docker:
+      - image: cimg/base:current
+    environment:
+      PLATFORM: "linux/amd64"
+      EXECUTOR: "amd64"
+  arm64:
+    docker:
+      - image: cimg/base:current
+    resource_class: arm.medium
+    environment:
+      PLATFORM: "linux/arm64"
+      EXECUTOR: "arm64"
+
+commands:
+  configure-ghcr:
+    description: Configure GHCR access
+    steps:
+      - run:
+          name: Configure GHCR
+          command: |
+            [ -z "$GHCR_TOKEN" ] && exit 0
+            [ -z "$GHCR_USER" ] && exit 0
+            for i in $(seq 1 5); do
+              echo "Logging into GHCR, attempt $i"
+              echo $GHCR_TOKEN | docker login ghcr.io -u $GHCR_USER --password-stdin && break
+              sleep 1
+            done
+
+jobs:
+  build-light:
+    parameters:
+      platform:
+        type: executor
+    executor: << parameters.platform >>
+    steps:
+      - checkout
+      - run:
+          name: "Light Build"
+          command: |
+            export VERSION=${CIRCLE_TAG:-latest}-${EXECUTOR}
+            docker build -f Dockerfile.light -t askem-beaker .
+            docker push ghcr.io/darpa-askem/beaker-kernel:${VERSION}
+
+  build-full:
+    parameters:
+      platform:
+        type: executor
+    executor: << parameters.platform >>
+    steps:
+      - checkout
+      - run:
+          name: "Full Build"
+          command: |
+            export VERSION=${CIRCLE_TAG:-latest}-${EXECUTOR}
+            docker build -f Dockerfile.full -t askem-beaker .
+            docker push ghcr.io/darpa-askem/beaker-kernel:${VERSION}
+
+  publish:
+    docker:
+      - image: docker:latest
+    steps:
+      - checkout
+      - setup_remote_docker
+      - configure-dockerhub
+      - run:
+          name: Create and push manifest for multiarch
+          command: |
+            export VERSION=${CIRCLE_TAG:-latest}
+            docker manifest create \
+            ghcr.io/darpa-askem/beaker-kernel:${VERSION} \
+            --amend ghcr.io/darpa-askem/beaker-kernel:${VERSION}-amd64 \
+            --amend ghcr.io/darpa-askem/beaker-kernel:${VERSION}-arm64
+            docker manifest push ghcr.io/darpa-askem/beaker-kernel:${VERSION}
+
+workflows:
+  publish:
+    jobs:
+      - build-light
