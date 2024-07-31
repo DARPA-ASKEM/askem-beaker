@@ -30,6 +30,17 @@ commands:
               sleep 1
             done
 
+  environment-generator:
+    description: Generate env variables for the build
+    steps:
+      - run:
+          name: Generate build variables
+          command: |
+            echo "export DOCKER_REGISTRY=ghcr.io" >> $BASH_ENV
+            echo "export DOCKER_ORG=darpa-askem" >> $BASH_ENV
+            echo "export PACKAGE_NAME=beaker-kernel" >> $BASH_ENV
+            source $BASH_ENV
+
   tag-generator:
     description: Format CIRCLE_TAG
     steps:
@@ -60,14 +71,15 @@ jobs:
       - checkout
       - setup_remote_docker
       - configure-ghcr
+      - environment-generator
       - tag-generator
       - run:
           name: "Light Build"
           command: |
             export VERSION=${IMAGE_TAG}-${EXECUTOR}
             echo "Building image: ${VERSION}"
-            docker build -f Dockerfile.light -t askem-beaker .
-            docker push ghcr.io/darpa-askem/beaker-kernel:${VERSION}
+            docker build -f Dockerfile.light -t ${DOCKER_REGISTRY}/${DOCKER_ORG}/${PACKAGE_NAME}:${VERSION} .
+            docker push ${DOCKER_REGISTRY}/${DOCKER_ORG}/${PACKAGE_NAME}:${VERSION}
 
   build-full:
     parameters:
@@ -78,14 +90,15 @@ jobs:
       - checkout
       - setup_remote_docker
       - configure-ghcr
+      - environment-generator
       - tag-generator
       - run:
           name: "Full Build"
           command: |
             export VERSION=${IMAGE_TAG}-${EXECUTOR}
             echo "Building image: ${VERSION}"
-            docker build -f Dockerfile.full -t askem-beaker .
-            docker push ghcr.io/darpa-askem/beaker-kernel:${VERSION}
+            docker build -f Dockerfile.full -t ${DOCKER_REGISTRY}/${DOCKER_ORG}/${PACKAGE_NAME}:${VERSION} .
+            docker push ${DOCKER_REGISTRY}/${DOCKER_ORG}/${PACKAGE_NAME}:${VERSION}
 
   publish:
     docker:
@@ -94,16 +107,17 @@ jobs:
       - checkout
       - setup_remote_docker
       - configure-ghcr
+      - environment-generator
       - tag-generator
       - run:
           name: Create and push manifest for multiarch
           command: |
             echo "Creating manifest for image: ${IMAGE_TAG}"
             docker manifest create \
-            ghcr.io/darpa-askem/beaker-kernel:${IMAGE_TAG} \
-            --amend ghcr.io/darpa-askem/beaker-kernel:${IMAGE_TAG}-amd64 \
-            --amend ghcr.io/darpa-askem/beaker-kernel:${IMAGE_TAG}-arm64
-            docker manifest push ghcr.io/darpa-askem/beaker-kernel:${IMAGE_TAG}
+            ${DOCKER_REGISTRY}/${DOCKER_ORG}/${PACKAGE_NAME}:${IMAGE_TAG} \
+            --amend ${DOCKER_REGISTRY}/${DOCKER_ORG}/${PACKAGE_NAME}:${IMAGE_TAG}-amd64 \
+            --amend ${DOCKER_REGISTRY}/${DOCKER_ORG}/${PACKAGE_NAME}:${IMAGE_TAG}-arm64
+            docker manifest push ${DOCKER_REGISTRY}/${DOCKER_ORG}/${PACKAGE_NAME}:${IMAGE_TAG}
 
 workflows:
   build-publish:
