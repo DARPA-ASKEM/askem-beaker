@@ -4,13 +4,14 @@ executors:
   amd64:
     docker:
       - image: cimg/base:current
+    resource_class: large
     environment:
       PLATFORM: "linux/amd64"
       EXECUTOR: "amd64"
   arm64:
     docker:
       - image: cimg/base:current
-    resource_class: arm.medium
+    resource_class: arm.large
     environment:
       PLATFORM: "linux/arm64"
       EXECUTOR: "arm64"
