@@ -32,8 +32,6 @@ commands:
 
   tag-generator:
     description: Format CIRCLE_TAG
-    outputs:
-      tag: ${{ steps.generate.outputs.tag }}
     steps:
       - run: Generate appropriate tag
         command: |
