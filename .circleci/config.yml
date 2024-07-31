@@ -33,7 +33,7 @@ commands:
   tag-generator:
     description: Format CIRCLE_TAG
     steps:
-      - run: 
+      - run:
           name: Generate appropriate tag
           command: |
             if [ -n "${CIRCLE_TAG}" ]; then
@@ -46,7 +46,9 @@ commands:
             else
               IMAGE_TAG=latest
             fi
-            export IMAGE_TAG
+            
+            echo "export IMAGE_TAG=${IMAGE_TAG}" >> $BASH_ENV
+            source $BASH_ENV
 
 jobs:
   build-light:
