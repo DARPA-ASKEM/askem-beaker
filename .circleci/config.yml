@@ -53,6 +53,7 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
+      - configure-ghcr
       - run:
           name: "Full Build"
           command: |
@@ -66,7 +67,7 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - configure-dockerhub
+      - configure-ghcr
       - run:
           name: Create and push manifest for multiarch
           command: |
