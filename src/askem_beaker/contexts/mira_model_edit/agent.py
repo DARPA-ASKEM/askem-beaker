@@ -94,7 +94,7 @@ class MiraModelEditAgent(BaseAgent):
                 "content": code.strip(),
             }
         )
-  
+
     @tool()
     async def add_observable(self, new_id: str, new_name: str, new_expression: str, agent: AgentRef, loop: LoopControllerRef):
         """
@@ -114,7 +114,7 @@ class MiraModelEditAgent(BaseAgent):
                 "content": code.strip(),
             }
         )
-  
+
     @tool()
     async def remove_observable(self, remove_id: str, agent: AgentRef, loop: LoopControllerRef):
         """
@@ -135,9 +135,9 @@ class MiraModelEditAgent(BaseAgent):
 
     @tool()
     async def add_natural_conversion_template(self,
-        subject_name: str, 
+        subject_name: str,
         subject_initial_value: float,
-        outcome_name: str, 
+        outcome_name: str,
         outcome_initial_value: float,
         parameter_name: str,
         parameter_units: str,
@@ -147,11 +147,11 @@ class MiraModelEditAgent(BaseAgent):
         template_name: str,
         agent: AgentRef, loop: LoopControllerRef):
         """
-        This tool is used when a user wants to add a natural conversion to the model. 
+        This tool is used when a user wants to add a natural conversion to the model.
         A natural conversion is a template that contains two states and a transition where one state is sending population to the transition and one state is recieving population from the transition.
         The transition rate may only depend on the subject state.
-        
-        An example of this would be "Add a new transition from S to R with the name vaccine with the rate of v" 
+
+        An example of this would be "Add a new transition from S to R with the name vaccine with the rate of v"
         Where S is the subject state, R is the outcome state, vaccine is the template_name, and v is the template_expression.
 
         Args:
@@ -159,16 +159,16 @@ class MiraModelEditAgent(BaseAgent):
             subject_initial_value (float): The number assosiated with the subject state at its first step in time. If not known or not specified the default value of `1` should be used.
             outcome_name (str): the state name that is the new transition's outputs. This is the state population moves to.
             outcome_initial_value (float): The number assosiated with the output state at its first step in time. If not known or not specified the default value of `1` should be used.
-            parameter_name (str): the name of the parameter. 
-            parameter_units (str): The units assosiated with the parameter. 
+            parameter_name (str): the name of the parameter.
+            parameter_units (str): The units assosiated with the parameter.
             parameter_value (float): This is a numeric value provided by the user. If not known or not specified the default value of `1` should be used.
             parameter_description (str): The description assosiated with the parameter. If not known or not specified the default value of `` should be used
             template_expression (str): The mathematical rate law for the transition.
             template_name (str): the name of the transition.
         """
-        
+
         code = agent.context.get_code("add_natural_conversion_template", {
-            "subject_name": subject_name, 
+            "subject_name": subject_name,
             "subject_initial_value": subject_initial_value,
             "outcome_name": outcome_name,
             "outcome_initial_value": outcome_initial_value,
@@ -177,10 +177,10 @@ class MiraModelEditAgent(BaseAgent):
             "parameter_value": parameter_value,
             "parameter_description": parameter_description,
             "template_expression": template_expression,
-            "template_name": template_name  
+            "template_name": template_name
         })
         loop.set_state(loop.STOP_SUCCESS)
-        return json.dumps( 
+        return json.dumps(
             {
                 "action": "code_cell",
                 "language": "python3",
@@ -190,9 +190,9 @@ class MiraModelEditAgent(BaseAgent):
 
     @tool()
     async def add_controlled_conversion_template(self,
-        subject_name: str, 
+        subject_name: str,
         subject_initial_value: float,
-        outcome_name: str, 
+        outcome_name: str,
         outcome_initial_value: float,
         controller_name: str,
         controller_initial_value: float,
@@ -204,12 +204,12 @@ class MiraModelEditAgent(BaseAgent):
         template_name: str,
         agent: AgentRef, loop: LoopControllerRef):
         """
-        This tool is used when a user wants to add a controlled conversion to the model. 
+        This tool is used when a user wants to add a controlled conversion to the model.
         A controlled conversion is a template that contains two states and a transition where one state is sending population to the transition and one state is recieving population from the transition.
         This transition rate depends on a controller state. This controller state can be an existing or new state in the model.
-        
+
         An example of this would be "Add a new transition from S to R with the name vaccine with the rate of v. v depends on I"
-        Where S is the subject state, R is the outcome state, vaccine is the template_name, and v is the template_expression and I is the controller_name. 
+        Where S is the subject state, R is the outcome state, vaccine is the template_name, and v is the template_expression and I is the controller_name.
 
         Args:
             subject_name (str): The state name that is the source of the new transition. This is the state population comes from.
@@ -227,7 +227,7 @@ class MiraModelEditAgent(BaseAgent):
         """
 
         code = agent.context.get_code("add_controlled_conversion_template", {
-            "subject_name": subject_name, 
+            "subject_name": subject_name,
             "subject_initial_value": subject_initial_value,
             "outcome_name": outcome_name,
             "outcome_initial_value": outcome_initial_value,
@@ -238,10 +238,10 @@ class MiraModelEditAgent(BaseAgent):
             "parameter_value": parameter_value,
             "parameter_description": parameter_description,
             "template_expression": template_expression,
-            "template_name": template_name  
+            "template_name": template_name
         })
         loop.set_state(loop.STOP_SUCCESS)
-        return json.dumps( 
+        return json.dumps(
             {
                 "action": "code_cell",
                 "language": "python3",
@@ -251,7 +251,7 @@ class MiraModelEditAgent(BaseAgent):
 
     @tool()
     async def add_natural_production_template(self,
-        outcome_name: str, 
+        outcome_name: str,
         outcome_initial_value: float,
         parameter_name: str,
         parameter_units: str,
@@ -261,7 +261,7 @@ class MiraModelEditAgent(BaseAgent):
         template_name: str,
         agent: AgentRef, loop: LoopControllerRef):
         """
-        This tool is used when a user wants to add a natural production to the model. 
+        This tool is used when a user wants to add a natural production to the model.
         A natural production is a template that contains one state which is recieving population by one transition. The transition will not depend on any state.
 
         An example of this would be "Add a new transition from the transition rec to S with a rate of f."
@@ -286,10 +286,10 @@ class MiraModelEditAgent(BaseAgent):
             "parameter_value": parameter_value,
             "parameter_description": parameter_description,
             "template_expression": template_expression,
-            "template_name": template_name  
+            "template_name": template_name
         })
         loop.set_state(loop.STOP_SUCCESS)
-        return json.dumps( 
+        return json.dumps(
             {
                 "action": "code_cell",
                 "language": "python3",
@@ -299,7 +299,7 @@ class MiraModelEditAgent(BaseAgent):
 
     @tool()
     async def add_controlled_production_template(self,
-        outcome_name: str, 
+        outcome_name: str,
         outcome_initial_value: float,
         controller_name: str,
         controller_initial_value: float,
@@ -311,7 +311,7 @@ class MiraModelEditAgent(BaseAgent):
         template_name: str,
         agent: AgentRef, loop: LoopControllerRef):
         """
-        This tool is used when a user wants to add a controlled production to the model. 
+        This tool is used when a user wants to add a controlled production to the model.
         A controlled production is a template that contains one state which is recieving population by one transition. This transition rate depends on a controller state. This controller state can be an existing or new state in the model.
 
         An example of this would be "Add a new transition from the transition rec to S with a rate of f. f depends on R. "
@@ -340,10 +340,10 @@ class MiraModelEditAgent(BaseAgent):
             "parameter_value": parameter_value,
             "parameter_description": parameter_description,
             "template_expression": template_expression,
-            "template_name": template_name  
+            "template_name": template_name
         })
         loop.set_state(loop.STOP_SUCCESS)
-        return json.dumps( 
+        return json.dumps(
             {
                 "action": "code_cell",
                 "language": "python3",
@@ -353,7 +353,7 @@ class MiraModelEditAgent(BaseAgent):
 
     @tool()
     async def add_natural_degradation_template(self,
-        subject_name: str, 
+        subject_name: str,
         subject_initial_value: float,
         parameter_name: str,
         parameter_units: str,
@@ -363,7 +363,7 @@ class MiraModelEditAgent(BaseAgent):
         template_name: str,
         agent: AgentRef, loop: LoopControllerRef):
         """
-        This tool is used when a user wants to add a natural degradation to the model. 
+        This tool is used when a user wants to add a natural degradation to the model.
         A natural degradation is a template that contains one state in which the population is leaving through one transition. The transition may only depend on the subject state.
 
         An example of this would be "Add a new transition from state S to transition rec with a rate of v."
@@ -388,10 +388,10 @@ class MiraModelEditAgent(BaseAgent):
             "parameter_value": parameter_value,
             "parameter_description": parameter_description,
             "template_expression": template_expression,
-            "template_name": template_name  
+            "template_name": template_name
         })
         loop.set_state(loop.STOP_SUCCESS)
-        return json.dumps( 
+        return json.dumps(
             {
                 "action": "code_cell",
                 "language": "python3",
@@ -401,7 +401,7 @@ class MiraModelEditAgent(BaseAgent):
 
     @tool()
     async def add_controlled_degradation_template(self,
-        subject_name: str, 
+        subject_name: str,
         subject_initial_value: float,
         controller_name: str,
         controller_initial_value: float,
@@ -413,7 +413,7 @@ class MiraModelEditAgent(BaseAgent):
         template_name: str,
         agent: AgentRef, loop: LoopControllerRef):
         """
-        This tool is used when a user wants to add a controlled degradation to the model. 
+        This tool is used when a user wants to add a controlled degradation to the model.
         A controlled degradation is a template that contains one state in which the population is leaving through one transition. This transition rate depends on a controller state. This controller state can be an existing or new state in the model.
 
         An example of this would be "Add a new transition from S to rec with a rate of v. v depends on R."
@@ -442,10 +442,10 @@ class MiraModelEditAgent(BaseAgent):
             "parameter_value": parameter_value,
             "parameter_description": parameter_description,
             "template_expression": template_expression,
-            "template_name": template_name  
+            "template_name": template_name
         })
         loop.set_state(loop.STOP_SUCCESS)
-        return json.dumps( 
+        return json.dumps(
             {
                 "action": "code_cell",
                 "language": "python3",
@@ -474,7 +474,7 @@ class MiraModelEditAgent(BaseAgent):
             "new_rate_law": new_rate_law
         })
         loop.set_state(loop.STOP_SUCCESS)
-        return json.dumps( 
+        return json.dumps(
             {
                 "action": "code_cell",
                 "language": "python3",
@@ -493,7 +493,7 @@ class MiraModelEditAgent(BaseAgent):
         modify_names: bool = True
     ):
         """
-        This tool is used when a user wants to stratify a model. 
+        This tool is used when a user wants to stratify a model.
         This will multiple the model utilizing several strata.
 
         An example of this would be "Stratify by location Toronto, Ottawa and Montreal. There are no interactions between members unless they are in the same location."
@@ -504,7 +504,7 @@ class MiraModelEditAgent(BaseAgent):
         Args:
             key (str):
                 The (singular) name which describe the stratification. Some examples include, ``"City"``, ``"Age"``, ``"Vacination_Status"``, and ``"Location"``
-                If a key cannot be explicitly grabbed from try your best to categorize the strata  
+                If a key cannot be explicitly grabbed from try your best to categorize the strata
             strata (Collection):
                 These will be the individual groups used to stratify by. This should be converted to a list of strings for e.g., ``["boston", "nyc"]``
                 or ``["geonames:4930956", "geonames:5128581"]``.
@@ -512,17 +512,17 @@ class MiraModelEditAgent(BaseAgent):
                 This describes how different strata within the same state are able to interact.
                 An iterable of pairs corresponding to a directed network structure
                 where each of the pairs has two strata. If none given, will assume a complete
-                network structure. If no structure is necessary, pass an empty list. 
-                By default this should be an empty list. 
+                network structure. If no structure is necessary, pass an empty list.
+                By default this should be an empty list.
             directed (bool):
                 If the structure tuples are combinations this should be True. If they are permutations this should be false.
                 If this value cannot be found it should default to False
             cartesian_control (bool):
-                True if the strata from different state variables can interact. 
+                True if the strata from different state variables can interact.
                 For example Susceptible young people can interact with infected old poeple.
                 false if they cannot interact.
                 For example the infected people in Toronto do not interact with the susceptible people in Boston
-                
+
                 This will split all control relationships based on the stratification.
 
                 This should be true for an SIR epidemiology model, the susceptibility to
@@ -554,7 +554,46 @@ class MiraModelEditAgent(BaseAgent):
             "modify_names": modify_names
         })
         loop.set_state(loop.STOP_SUCCESS)
-        return json.dumps( 
+        return json.dumps(
+            {
+                "action": "code_cell",
+                "language": "python3",
+                "content": code.strip(),
+            }
+        )
+
+    @tool()
+    async def add_parameter(self,
+        agent: AgentRef, loop: LoopControllerRef,
+        parameter_id: str,
+        name: str,
+        description: str,
+        value: float,
+        distribution: str,
+        units_mathml: str
+    ):
+        """
+        This tool is used when a user wants to add a parameter to a model.
+
+        Args:
+            parameter_id (str): The ID of the new parameter to add
+            name (str): The optional display name of the new parameter. If not known or not specified this should be set to the parameter_id.
+            description (str): The optional description of the new parameter. If not known or not specified this should be set to ``.
+            value (float): The optional value of the new parameter. If not known or not specified this should be set to None.
+            distribution (str): The optional distribution of the new parameter. If not known or not specified this should be set to None.
+            units_mathml (str): The optional units of the new parameter as a MathML XML string. If not known or not specified this should be set to None.
+        """
+
+        code = agent.context.get_code("add_parameter", {
+            "parameter_id": parameter_id,
+            "name": name,
+            "description": description,
+            "value": value,
+            "distribution": distribution,
+            "units_mathml": units_mathml
+        })
+        loop.set_state(loop.STOP_SUCCESS)
+        return json.dumps(
             {
                 "action": "code_cell",
                 "language": "python3",
