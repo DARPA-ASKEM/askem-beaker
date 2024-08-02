@@ -62,8 +62,7 @@ jobs:
     executor: << parameters.platform >>
     steps:
       - checkout
-      - setup_remote_docker:
-          docker_layer_caching: true
+      - setup_remote_docker
       - configure-ghcr
       - tag-generator
       - run:
@@ -81,8 +80,7 @@ jobs:
     executor: << parameters.platform >>
     steps:
       - checkout
-      - setup_remote_docker:
-          docker_layer_caching: true
+      - setup_remote_docker
       - configure-ghcr
       - tag-generator
       - run:
@@ -99,8 +97,7 @@ jobs:
     resource_class: small
     steps:
       - checkout
-      - setup_remote_docker:
-          docker_layer_caching: true
+      - setup_remote_docker
       - configure-ghcr
       - tag-generator
       - run:
