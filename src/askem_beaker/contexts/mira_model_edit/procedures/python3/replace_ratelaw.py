@@ -18,9 +18,10 @@ def replace_rate_law_sympy(model, template_name, new_rate_law):
     """
     assert isinstance(model, TemplateModel)
     tm = model
+    local_dict = { key:key for key, _value in tm.parameters.items() }
     for template in tm.templates:
         if template.name == template_name:
-            template.set_rate_law(new_rate_law, local_dict=None)
+            template.set_rate_law(new_rate_law, local_dict=local_dict)
     return tm
 
 model = replace_rate_law_sympy(model, "{{ template_name }}", "{{ new_rate_law }}")
