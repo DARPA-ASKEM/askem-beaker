@@ -18,7 +18,7 @@ def replace_rate_law_sympy(model, template_name, new_rate_law):
     assert isinstance(model, TemplateModel)
     tm = model
     local_dict = { key:sympy.Symbol(key) for key, _value in tm.parameters.items() }
-    for k, v in mmt.get_concepts_name_map().items():
+    for k, v in tm.get_concepts_name_map().items():
         local_dict[k] = sympy.Symbol(k)
 
     for template in tm.templates:
