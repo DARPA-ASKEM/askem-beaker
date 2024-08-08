@@ -24,7 +24,7 @@ RUN useradd -m jupyter
 USER jupyter
 
 # Install PyCIEMSS from GitHub
-RUN pip install --no-cache-dir git+https://github.com/ciemss/pyciemss.git@9aa5d8849c630e8d2b208d25464d7b006fcd4d60 --use-pep517
+RUN pip install --no-cache-dir git+https://github.com/ciemss/pyciemss.git@adeb6b974746f86b20597e3d037041121e8ac9c9 --use-pep517
 
 # Install MIRA from GitHub
 RUN git clone https://github.com/indralab/mira.git /home/jupyter/mira
