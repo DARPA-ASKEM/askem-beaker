@@ -656,7 +656,7 @@ class MiraModelEditAgent(BaseAgent):
             name (str): The optional display name of the new parameter. If not known or not specified this should be set to the parameter_id.
             description (str): The optional description of the new parameter. If not known or not specified this should be set to ``.
             value (float): The optional value of the new parameter. If not known or not specified this should be set to None.
-            distribution (dict): The optional distribution of the new parameter. If not known or not specified this should be set to None.
+            distribution (str): The optional distribution of the new parameter. If not known or not specified this should be set to None.
             units_mathml (str): The optional units of the new parameter as a MathML XML string. If not known or not specified this should be set to None.
         """
 
