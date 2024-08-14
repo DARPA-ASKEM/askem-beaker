@@ -600,3 +600,87 @@ class MiraModelEditAgent(BaseAgent):
                 "content": code.strip(),
             }
         )
+
+    @tool()
+    async def change_rate_law_and_add_parameter(self,
+        agent: AgentRef, loop: LoopControllerRef,
+        template_name: str,
+        new_rate_law: str,
+        parameter_id: str,
+        name: str,
+        description: str,
+        value: float,
+        distribution: str,
+        units_mathml: str
+    ):
+        """
+        This tool is used when a user wants to replace a ratelaw and add a parameter to a model.
+
+        If the parameter is specified as a distribution, the distribution arg should be a dictionary
+        object that looks like
+
+        {
+            "type": <distribution_type>
+            "parameters": {
+                <user_specified_criteria>
+            }
+        }
+
+        If the distribution is uniform, then <distribution_type> should be "StandardUniform1"
+
+        Try to match the distribution to one of the templates below if possible, otherwise use your best judgement
+
+        1. uniform distribution, this is specified with a low value nad a high value
+        {
+          "type": "StandardUniform1",
+          "parameters": {
+            "minimum": <low value>,
+            "maximum": <high value>
+          }
+        }
+
+        2. a normal/gaussian distribution with a mean and standard deviation
+        {
+          "type": "Normal1",
+          "parameters": {
+            "mean": <mean value>,
+            "stdev": <standard deviation>
+          }
+        }
+
+
+        Args:
+            template_name (str): This is the name of the template that has the rate law.
+            new_rate_law (str): This is the mathematical expression used to determine the rate law.
+            parameter_id (str): The ID of the new parameter to add
+            name (str): The optional display name of the new parameter. If not known or not specified this should be set to the parameter_id.
+            description (str): The optional description of the new parameter. If not known or not specified this should be set to ``.
+            value (float): The optional value of the new parameter. If not known or not specified this should be set to None.
+            distribution (str): The optional distribution of the new parameter. If not known or not specified this should be set to None.
+            units_mathml (str): The optional units of the new parameter as a MathML XML string. If not known or not specified this should be set to None.
+        """
+
+        code = agent.context.get_code("add_parameter", {
+            "parameter_id": parameter_id,
+            "name": name,
+            "description": description,
+            "value": value,
+            "distribution": distribution,
+            "units_mathml": units_mathml
+        })
+
+        code2 = agent.context.get_code("replace_ratelaw", {
+            "template_name": template_name,
+            "new_rate_law": new_rate_law
+        })
+
+        loop.set_state(loop.STOP_SUCCESS)
+
+        # Order matters here, the parameter need to exist in order to have an expression with said parameter
+        return json.dumps(
+            {
+                "action": "code_cell",
+                "language": "python3",
+                "content": code.strip() + "\n\n\n\n\n" + code2.strip(),
+            }
+        )
