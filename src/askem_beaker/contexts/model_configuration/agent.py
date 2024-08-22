@@ -31,12 +31,13 @@ class ConfigEditAgent(BaseAgent):
         self, query: str, agent: AgentRef, loop: LoopControllerRef
     ) -> None:
         """
-        Generated  code to be run in an interactive Jupyter notebook for the purpose of modifying a model configuration.
+        Generated  code to be run in an interactive Jupyter notebook for the purpose of modifying a model configuration. This may include modifying
+        the configuration based on an available dataset. If the user mentions a dataset, it will always be a Pandas DataFrame called `dataset`.
 
-        Input is a full grammatically correct question about or request for an action to be performed on the loaded model configuration.
+        Input is a full grammatically correct question about or request for an action to be performed on the loaded model configuration (and optionally a dataset).
 
         Args:
-            query (str): A fully grammatically correct question about the current model configuration.
+            query (str): A fully grammatically correct question about the current model configuration (and optional dataset).
 
         """
         prompt = f"""
@@ -52,6 +53,8 @@ It will comply with the schema:
 
 The current configuration is:
 {agent.context.model_config}
+
+The user may ask you to update the model configuration based on a dataset. If they do, you should use the `dataset` DataFrame to update the model configuration.
 
 Please write code that satisfies the user's request below.
 
