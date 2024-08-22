@@ -16,7 +16,14 @@ This context is used for editing model configurations in Terarium's new JSON sty
 }
 ```
 
-> **Note**: after setup, the model configuration is accessible via the variable name `model_config`.
+You can also provide a `dataset_id` if you wish to parameterize a model configuration based on a dataset. For example:
+
+```
+{"id": "161bee2c-f5eb-4811-a407-0d789ebccbf5",
+ "dataset_id": "e3eecbf9-bc90-4591-9d90-0b9ab20472ad"}
+```
+
+> **Note**: after setup, the model configuration is accessible via the variable name `model_config`. If a dataset is provided it's loaded as a Pandas DataFrame `dataset`.
 
 This context's LLM agent allows the user to ask various questions of the configuration values and to edit the values. It is aware of the schema constraints and oeprates within them.
 
