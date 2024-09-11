@@ -30,13 +30,26 @@ class MiraModelEditAgent(BaseAgent):
       ...
     }
 
-    Instead of manipulating the model directly, the agent will always return code that will be run externally in a jupyter notebook.
+    Instead of manipulating the model directly, the agent will always return code that will be run externally in a jupyter notebook
+    except in the case of inspect_template_model where the agent will return the model.
+
+    The template model will be the variable called `model`. If you are asked to perform multiple edits to a model at once you should consider
+    which tools to use and in which order to use them.
 
     """
 
     def __init__(self, context: BaseContext = None, tools: list = None, **kwargs):
         super().__init__(context, tools, **kwargs)
 
+    @tool()
+    async def inspect_template_model(self, agent: AgentRef):
+        """
+        This tool is used to inspect the template model to learn about its transitions, parameters, rates, states, observables, etc.
+        """
+        code = agent.context.get_code("inspect_template_model", {"model_name": "model"})
+        response = await agent.context.evaluate(code)
+        return response["return"]
+    
     @tool()
     async def replace_template_name(self, old_name: str, new_name: str, agent: AgentRef, loop: LoopControllerRef):
         """
@@ -57,14 +70,14 @@ class MiraModelEditAgent(BaseAgent):
         )
 
     @tool()
-    async def remove_template(self, template_name: str, agent: AgentRef, loop: LoopControllerRef):
+    async def remove_templates(self, template_names: list[str], agent: AgentRef, loop: LoopControllerRef):
         """
-        This tool is used when a user wants to remove an existing template that is part of a model.
+        This tool is used when a user wants to remove existing template(s) that are part of a model.
 
         Args:
-            template_name (str): This is the name of the template that is to be removed.
+            template_names (list[str]): This is a list of template names that are to be removed.
         """
-        code = agent.context.get_code("remove_template", {"template_name": template_name })
+        code = agent.context.get_code("remove_templates", template_names)
         loop.set_state(loop.STOP_SUCCESS)
         return json.dumps(
             {
@@ -73,7 +86,6 @@ class MiraModelEditAgent(BaseAgent):
                 "content": code.strip(),
             }
         )
-
 
     @tool()
     async def replace_state_name(self, template_name: str, old_name: str, new_name: str, agent: AgentRef, loop: LoopControllerRef):
@@ -684,3 +696,49 @@ class MiraModelEditAgent(BaseAgent):
                 "content": code.strip() + "\n\n\n\n\n" + code2.strip(),
             }
         )
+    
+    @tool()
+    async def generate_code(
+        self, query: str, agent: AgentRef, loop: LoopControllerRef
+    ) -> None:
+        """
+        Generate code to be run in an interactive Jupyter notebook for the purpose of exploring, modifying and interacting with a Mira
+        Template Model.
+
+        Input is a full grammatically correct question about or request for an action to be performed on the model or related to the model.
+
+        Args:
+            query (str): A fully grammatically correct question about the current model.
+
+        """
+        # set up the agent
+        # str: Valid and correct python code that fulfills the user's request.
+        prompt = """
+You are a programmer writing code to help with Mira Template Model editing and manipulation in a Jupyter Notebook.
+
+Please write code that satisfies the user's request.
+
+You have access to a model `model` that is a Mira Template Model. You can use the `inspect_template_model` tool to better understand it
+and its structure.
+
+If you are asked to edit the model, you should try to use other tools for it. You can use the `replace_template_name`, `remove_template`, 
+`replace_state_name`, `add_observable`, `remove_observable`, `add_natural_conversion_template`, `add_controlled_conversion_template`, 
+`add_natural_production_template`, `add_controlled_production_template`, `add_natural_degradation_template`, `add_controlled_degradation_template`, 
+`replace_ratelaw`, `stratify`, `add_parameter`, `change_rate_law_and_add_parameter` tools to help with this.
+
+Please generate the code as if you were programming inside a Jupyter Notebook and the code is to be executed inside a cell.
+You MUST wrap the code with a line containing three backticks (```) before and after the generated code.
+No addtional text is needed in the response, just the code block.
+"""
+
+        llm_response = await agent.oneshot(prompt=prompt, query=query)
+        loop.set_state(loop.STOP_SUCCESS)
+        preamble, code, coda = re.split("```\w*", llm_response)
+        result = json.dumps(
+            {
+                "action": "code_cell",
+                "language": agent.context.lang,
+                "content": code.strip(),
+            }
+        )
+        return result
