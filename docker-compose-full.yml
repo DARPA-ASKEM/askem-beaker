@@ -32,7 +32,6 @@ services:
       AWS_URL: "http://minio:9000"
       CIEMSS-SERVICE_URL: "http://pyciemss-service:8000"
       GOOGLE-ANALYTICS-ID: ""
-      SIMULATION-SERVICE_URL: "http://sciml-service:8080"
       SPICEDB_LAUNCHMODE: "PLAINTEXT"
       SPICEDB_SHARED-KEY: "dev"
       SPICEDB_TARGET: "spicedb:50051"
