@@ -35,7 +35,8 @@ You are given one or more epidemiological datasets containing **incidence data**
   - **Cumulative Deaths**: Map to the total number of deaths.
 
 #### 3.2. Handling Dates and Locations
-- Focus on the national data (e.g., `location_name = "United States"`). Ensure the dataset is sorted by date.
+- You may be asked to filter by location. In that case you must identify and utilizie the geographic feature(s) available to you
+in the dataset. Some datasets will not have geographic features. All _should_ have dates; ensure the dataset is sorted by date.
 
 #### 3.3. User-Specified Windows
 - Allow the user to specify recovery windows (e.g., 14 days for infections, 10 days for hospitalizations).
@@ -64,9 +65,9 @@ You are given one or more epidemiological datasets containing **incidence data**
 - Combine the time series data into one DataFrame. Ensure that all variables (I, R, H, D) are aligned by their common date index.
 
 #### 4.2. Calculate Susceptible Population (S)
-- Define a total population (e.g., 150 million) if not provided by the user.
+- Define a total population (e.g., 150 million) if not provided by the user. Be explicit and obvious so the user can adjust this as needed.
 - Calculate the susceptible population as:
-  - **S** = Total population - I - R - H - D.
+  - **S** = Total population - I - R - H - D (and/or other compartments as needed)
 
 #### 4.3. Adjust Recovered Population
 - Ensure that recovered individuals exclude deaths:
@@ -75,7 +76,7 @@ You are given one or more epidemiological datasets containing **incidence data**
 ---
 
 ### 5. Return the Final Data
-- Return the final DataFrame with columns for S, I, R, H, D, and any additional user-specified compartments.
+- Return the final DataFrame with columns for each compartment (e.g. S, I, R, H, D).
 - Ensure the output is flexible and can handle various compartmental models or additional epidemiological categories.
 
 ---
