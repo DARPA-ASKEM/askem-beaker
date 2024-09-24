@@ -234,7 +234,13 @@ Statistics:
         new_dataset = copy.deepcopy(parent_dataset)
         del new_dataset["id"]
         new_dataset["name"] = new_name
-        new_dataset["description"] += f"\\nTransformed from dataset '{parent_dataset['name']}' ({parent_dataset['id']}) at {datetime.datetime.utcnow().strftime('%c %Z')}"
+
+        transformed_info = f"Transformed from dataset '{parent_dataset['name']}' ({parent_dataset['id']}) at {datetime.datetime.utcnow().strftime('%c %Z')}"
+        if "description" in new_dataset:
+            new_dataset["description"] += f"\\n{transformed_info}"
+        else:
+            new_dataset["description"] = transformed_info
+
         new_dataset["fileNames"] = [filename]
         #clear the columns field on the new dataset as there was likely a change to either the columns or the data. HMI-Server will deal with regenerating this.
         new_dataset["columns"] = []
