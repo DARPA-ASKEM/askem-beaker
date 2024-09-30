@@ -126,6 +126,46 @@ class MiraModelEditAgent(BaseAgent):
                 "content": code.strip(),
             }
         )
+    
+    @tool()
+    async def add_observable_pattern(self, new_name: str, 
+                                     identifier_keys: list[str], 
+                                     identifier_values: list[str],
+                                     context_keys: list[str],
+                                     context_values: list[str],
+                                     agent: AgentRef, 
+                                     loop: LoopControllerRef):
+        """
+        This tool is used when a user wants to add an observable via a complex pattern. You should inspect the model BEFORE using this tool
+        so that you can properly map the users request to the correct identifiers and contexts in the model. Typically the identifier key
+        will be something like "ido" and the identifier value will be something like "0000514". Context keys will be the name of the strata context (e.g. "Age")
+        and the values will be the value for that strata context (e.g. "youth"). 
+
+        When the user specifies a high level state (such as Infected) this would be specified via the identifiers; when the user specifies 
+        a strata (such as "youth") that is specified via the context.
+
+        Args:
+            new_name (str): The new name provided for the observable. If this is not provided something intuitive should be set.
+            identifier_keys (list[str]): The keys for the identifiers that will be used in the observable.
+            identifier_values (list[str]): The values for the identifiers that will be used in the observable.
+            context_keys (list[str]): The keys for the context that will be used in the observable.
+            context_values (list[str]): The values for the context that will be used in the observable.
+        """
+        code = agent.context.get_code("add_observable_pattern", 
+                                      {"new_name": new_name,
+                                       "identifier_keys": identifier_keys,
+                                       "identifier_values": identifier_values,
+                                       "context_keys": context_keys,
+                                       "context_values": context_values}
+                                      )
+        loop.set_state(loop.STOP_SUCCESS)
+        return json.dumps(
+            {
+                "action": "code_cell",
+                "language": "python3",
+                "content": code.strip(),
+            }
+        )    
 
     @tool()
     async def remove_observable(self, remove_id: str, agent: AgentRef, loop: LoopControllerRef):
