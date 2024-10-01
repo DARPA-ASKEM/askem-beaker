@@ -151,12 +151,16 @@ class MiraModelEditAgent(BaseAgent):
             context_keys (list[str]): The keys for the context that will be used in the observable.
             context_values (list[str]): The values for the context that will be used in the observable.
         """
+        identifier_dict = dict(zip(identifier_keys, identifier_values))
+        context_dict = dict(zip(context_keys, context_values))
         code = agent.context.get_code("add_observable_pattern", 
                                       {"new_name": new_name,
                                        "identifier_keys": identifier_keys,
                                        "identifier_values": identifier_values,
                                        "context_keys": context_keys,
-                                       "context_values": context_values}
+                                       "context_values": context_values,
+                                       "identifier_dict": identifier_dict,
+                                       "context_dict": context_dict}
                                       )
         loop.set_state(loop.STOP_SUCCESS)
         return json.dumps(
