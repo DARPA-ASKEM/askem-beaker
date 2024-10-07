@@ -82,7 +82,7 @@ class Toolset:
         
         # Generate all possible pairs of models to compare in the order that the plots
         # will be generated
-        comparison_pairs = [list(pair) for pair in itertools.combinations(model_vars, 2)]
+        agent.context.comparison_pairs = [list(pair) for pair in itertools.combinations(model_vars, 2)]
 
         plot_code = agent.context.get_code(
             "compare_mira_models",
@@ -94,8 +94,7 @@ class Toolset:
             {
                 "action": "code_cell",
                 "language": "python3",
-                "content": plot_code.strip(),
-                "plot_order": comparison_pairs
+                "content": plot_code.strip()
             }
         )
         return result
