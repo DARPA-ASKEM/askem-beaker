@@ -5,6 +5,7 @@ import io
 import json
 import logging
 import re
+import itertools
 
 from archytas.tool_utils import AgentRef, LoopControllerRef, tool, toolset
 from askem_beaker.contexts.mira.new_base_agent import NewBaseAgent
@@ -78,6 +79,11 @@ class Toolset:
         # handle those cases by extracting the proper field
         if isinstance(model_vars, dict):
             model_vars = list(model_vars.get("model_vars", []))
+        
+        # Generate all possible pairs of models to compare in the order that the plots
+        # will be generated
+        comparison_pairs = [list(pair) for pair in itertools.combinations(model_vars, 2)]
+
         plot_code = agent.context.get_code(
             "compare_mira_models",
             {
@@ -89,6 +95,7 @@ class Toolset:
                 "action": "code_cell",
                 "language": "python3",
                 "content": plot_code.strip(),
+                "plot_order": comparison_pairs
             }
         )
         return result
