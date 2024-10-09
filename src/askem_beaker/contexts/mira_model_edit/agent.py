@@ -525,6 +525,8 @@ class MiraModelEditAgent(BaseAgent):
                 An iterable of pairs corresponding to a directed network structure
                 where each of the pairs has two strata. If none given, will assume a complete
                 network structure. If no structure is necessary, pass an empty list.
+                For example [["Young", "Old"]] would mean that the population in Young can interact with the population in Old provided they are within the same state.
+                [["Toronto", "New York"], ["New York", "Toronto"]] would mean that the population in Toronto and New York can interact with each other provided they are in the same state.
                 By default this should be an empty list.
             directed (bool):
                 If the structure tuples are combinations this should be True. If they are permutations this should be false.
