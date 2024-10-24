@@ -1,6 +1,7 @@
 import json
 import logging
 import re
+import os
 
 from archytas.react import Undefined
 from archytas.tool_utils import AgentRef, LoopControllerRef, tool
@@ -12,6 +13,11 @@ from beaker_kernel.lib.jupyter_kernel_proxy import JupyterMessage
 logging.disable(logging.WARNING)  # Disable warnings
 logger = logging.Logger(__name__)
 
+# Specify the full path to the markdown file
+file_path = os.path.join(os.path.dirname(__file__), 'incidence_to_prevalence.md')
+
+with open(file_path, 'r') as file:
+    incidence_to_prevalence = file.read()
 
 class DatasetAgent(BaseAgent):
     """
@@ -54,6 +60,10 @@ Please write code that satisfies the user's request below.
 If you are asked to modify or update the dataframe, modify the dataframe in place, keeping the updated variable the same unless specifically specified otherwise.
 
 You also have access to the libraries {agent.context.metadata.get("libraries", "that are common for these tasks")}.
+
+You may be asked to assist in converting incidence data to prevalence data. In that case, please follow the following instructions:
+
+{incidence_to_prevalence}
 
 Please generate the code as if you were programming inside a Jupyter Notebook and the code is to be executed inside a cell.
 You MUST wrap the code with a line containing three backticks (```) before and after the generated code.
