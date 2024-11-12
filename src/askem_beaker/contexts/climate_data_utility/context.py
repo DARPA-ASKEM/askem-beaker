@@ -87,7 +87,7 @@ class ClimateDataUtilityContext(BaseContext):
         )
 
         self.dataset_map[variable_name] = {"id": hmi_dataset_id, "variable_name": variable_name}
-        await self.beaker_kernel.execute(
+        await self.execute(
             code,
             parent_header={},
         )

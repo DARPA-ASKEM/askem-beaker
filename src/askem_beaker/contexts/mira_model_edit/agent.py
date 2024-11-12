@@ -498,8 +498,8 @@ class MiraModelEditAgent(BaseAgent):
     async def stratify(self,
         agent: AgentRef, loop: LoopControllerRef,
         key: str,
-        strata: Collection[str],
-        structure: Optional[Iterable[Tuple[str, str]]] = None,
+        strata: list[str],
+        structure: Optional[list[tuple[str, str]]] = None,
         directed: bool = False,
         cartesian_control: bool = False,
         modify_names: bool = True
@@ -517,7 +517,7 @@ class MiraModelEditAgent(BaseAgent):
             key (str):
                 The (singular) name which describe the stratification. Some examples include, ``"City"``, ``"Age"``, ``"Vacination_Status"``, and ``"Location"``
                 If a key cannot be explicitly grabbed from try your best to categorize the strata
-            strata (Collection):
+            strata (list):
                 These will be the individual groups used to stratify by. This should be converted to a list of strings for e.g., ``["boston", "nyc"]``
                 or ``["geonames:4930956", "geonames:5128581"]``.
             structure (Optional):

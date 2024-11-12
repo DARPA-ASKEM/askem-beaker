@@ -67,6 +67,7 @@ COPY --chown=1000:1000 . /home/jupyter/askem_beaker/
 
 # Installs the askem specific subkernels
 RUN pip install --no-cache-dir --upgrade /home/jupyter/askem_beaker
+RUN pip uninstall -y archytas && pip install --no-cache-dir "archytas @ git+https://github.com/jataware/archytas.git@robust-tool-typing"
 
 #WORKDIR /askem_beaker
 WORKDIR /home/jupyter
