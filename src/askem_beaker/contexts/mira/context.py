@@ -41,6 +41,7 @@ class MiraContext(BaseContext):
         self.variables = {}
         self.imported_modules = {}
         self.few_shot_examples = ""
+        self.comparison_pairs = []
         self.code_blocks = (
             []
         )  # {'code':str,'execution_status':not_executed,executed_successfully,'execution_order':int,'output':output from running code block most recent time.}
@@ -479,3 +480,15 @@ Please answer any user queries or perform user instructions to the best of your 
                 documentation[package] = buf.getvalue()
         print(f"Fetched help for {documentation.keys()}")
         return documentation
+
+
+    @action()
+    async def get_comparison_pairs(self,message):
+        content = {"comparison_pairs": self.comparison_pairs}
+        self.send_response(
+            stream="iopub",
+            msg_or_type="get_comparison_pairs_response",
+            content= content,
+            parent_header=message.header,
+        )
+        return content
