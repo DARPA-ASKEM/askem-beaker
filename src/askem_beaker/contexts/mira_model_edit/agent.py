@@ -605,19 +605,19 @@ class MiraModelEditAgent(BaseAgent):
                 (e.g., ``"S"`` becomes ``"S_boston"``). If false, will keep the original
                 names.
                 If this cannot be found it should default to True
-            concepts_to_stratify (Collection, Optional): 
+            concepts_to_stratify (Optional): 
                 This is a list of the state variables in the model that is required to be stratified.
                 For example, given a model with state variables ("S", "E", "I", "R") and a request to only stratify the "S" state variable, the value of this argument should be ["S"].
                 If the request does not specify any state variable to stratify in particular, then the value of this argument should default to None.
-            concepts_to_preserve (Collection, Optional): 
+            concepts_to_preserve (Optional): 
                 This is a list of the state variables in the model that must not be stratified.
                 For example, given a model with state variables ("S", "E", "I", "R") and a request like "preserve" or "do not stratify" the "S" state variable, the value of this argument should be ["S"].
                 If the request does not specify any state variable to not be stratified or preserved in particular, then the value of this argument should default to None.
-            params_to_stratify (Collection, Optional):
+            params_to_stratify (Optional):
                 This is a list of the parameters in the model that is required to be stratified.
                 For example, given a model with parameters ("beta", "gamma") and a request to only stratify the "beta" parameter, the value of this argument should be ["beta"].
                 If the request does not specify any parameter to stratify in particular, then the value of this argument should default to None.
-            params_to_preserve (Collection, Optional):
+            params_to_preserve (Optional):
                 This is a list of the parameters in the model that must not be stratified.
                 For example, given a model with parameters ("beta", "gamma") and a request like "preserve" or "do not stratify" the "beta" parameter, the value of this argument should be ["beta"].
                 If the request does not specify any parameter to not be stratified or preserved in particular, then the value of this argument should default to None.
