@@ -546,7 +546,11 @@ class MiraModelEditAgent(BaseAgent):
         structure: Optional[Iterable[Tuple[str, str]]] = None,
         directed: bool = False,
         cartesian_control: bool = False,
-        modify_names: bool = True
+        modify_names: bool = True,
+        concepts_to_stratify: Optional[Collection[str]] = None,
+        concepts_to_preserve: Optional[Collection[str]] = None,
+        params_to_stratify: Optional[Collection[str]] = None,
+        params_to_preserve: Optional[Collection[str]] = None
     ):
         """
         This tool is used when a user wants to stratify a model.
@@ -601,6 +605,22 @@ class MiraModelEditAgent(BaseAgent):
                 (e.g., ``"S"`` becomes ``"S_boston"``). If false, will keep the original
                 names.
                 If this cannot be found it should default to True
+            concepts_to_stratify (Collection, Optional): 
+                This is a list of the state variables in the model that is required to be stratified.
+                For example, given a model with state variables ("S", "E", "I", "R") and a request to only stratify the "S" state variable, the value of this argument should be ["S"].
+                If the request does not specify any state variable to stratify in particular, then the value of this argument should default to None.
+            concepts_to_preserve (Collection, Optional): 
+                This is a list of the state variables in the model that must not be stratified.
+                For example, given a model with state variables ("S", "E", "I", "R") and a request like "preserve" or "do not stratify" the "S" state variable, the value of this argument should be ["S"].
+                If the request does not specify any state variable to not be stratified or preserved in particular, then the value of this argument should default to None.
+            params_to_stratify (Collection, Optional):
+                This is a list of the parameters in the model that is required to be stratified.
+                For example, given a model with parameters ("beta", "gamma") and a request to only stratify the "beta" parameter, the value of this argument should be ["beta"].
+                If the request does not specify any parameter to stratify in particular, then the value of this argument should default to None.
+            params_to_preserve (Collection, Optional):
+                This is a list of the parameters in the model that must not be stratified.
+                For example, given a model with parameters ("beta", "gamma") and a request like "preserve" or "do not stratify" the "beta" parameter, the value of this argument should be ["beta"].
+                If the request does not specify any parameter to not be stratified or preserved in particular, then the value of this argument should default to None.
         """
 
         code = agent.context.get_code("stratify", {
@@ -609,7 +629,11 @@ class MiraModelEditAgent(BaseAgent):
             "structure": structure,
             "directed": directed,
             "cartesian_control": cartesian_control,
-            "modify_names": modify_names
+            "modify_names": modify_names,
+            "concepts_to_stratify": concepts_to_stratify,
+            "concepts_to_preserve": concepts_to_preserve,
+            "params_to_stratify": params_to_stratify,
+            "params_to_preserve": params_to_preserve
         })
         loop.set_state(loop.STOP_SUCCESS)
         return json.dumps(
