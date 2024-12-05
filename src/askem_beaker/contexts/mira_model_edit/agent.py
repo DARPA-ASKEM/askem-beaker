@@ -42,6 +42,23 @@ class MiraModelEditAgent(BaseAgent):
         super().__init__(context, tools, **kwargs)
 
     @tool()
+    async def model_compose(self, models, agent: AgentRef):
+        """
+        This tool is used to compose merge multiple models together.
+
+        Args:
+            models: The models as a list.
+        """
+        code = agent.context.get_code("model_compose", {"models": models})
+        return json.dumps(
+            {
+                "action": "code_cell",
+                "language": "python3",
+                "content": code.strip(),
+            }
+        )
+
+    @tool()
     async def inspect_template_model(self, agent: AgentRef):
         """
         This tool is used to inspect the template model to learn about its transitions, parameters, rates, states, observables, etc.
