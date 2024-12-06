@@ -29,8 +29,8 @@ RUN pip install --no-cache-dir git+https://github.com/ciemss/pyciemss.git@adeb6b
 # Install MIRA from GitHub
 RUN git clone https://github.com/indralab/mira.git /home/jupyter/mira
 WORKDIR /home/jupyter/mira
+RUN git reset --hard 420832f132b1cebb30341a3fee1610a6542becef
 
-RUN git reset --hard 6683922c3c94fdd300eb3b81789328701a0ec876
 RUN pip install --no-cache-dir /home/jupyter/mira/"[ode,tests,dkg-client,dkg-construct,sbml,docs]" && \
     rm -r /home/jupyter/mira
 
