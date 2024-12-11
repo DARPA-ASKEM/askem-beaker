@@ -18,7 +18,7 @@ This context is used for editing models via [Mira](https://github.com/gyorilab/m
 
 > **Note**: after setup, the model is accessible via the variable name `model`.
 
-This context has **16 custom message types** 
+This context has **17 custom message types** 
 These will provide codeblocks which often have documentation within them to be provided to the user
 
 1. `reset_request`: resets the `model` back to its original state
@@ -38,6 +38,7 @@ These will provide codeblocks which often have documentation within them to be p
 9. `remove_observable_template_request` Remove an existing observable from the model.
 10. `replace_ratelaw_request` update the value of a ratelaw in the model.
 11. `amr_to_templates`: Breaks down an AMR into its template components.
+12. `merge_models`: Merges two or more models together.
 
 
 
