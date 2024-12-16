@@ -42,14 +42,15 @@ class MiraModelEditAgent(BaseAgent):
         super().__init__(context, tools, **kwargs)
 
     @tool()
-    async def model_compose(self, models: list, agent: AgentRef):
+    async def model_compose(self, models: list[str], agent: AgentRef, loop: LoopControllerRef):
         """
         This tool is used to compose merge multiple models together.
 
         Args:
-            models: The models as a list.
+            models (list[str]): The models as a list.
         """
         code = agent.context.get_code("model_compose", {"models": models})
+        loop.set_state(loop.STOP_SUCCESS)
         return json.dumps(
             {
                 "action": "code_cell",
