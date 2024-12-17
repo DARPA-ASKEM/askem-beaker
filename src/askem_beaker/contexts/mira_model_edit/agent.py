@@ -49,7 +49,7 @@ class MiraModelEditAgent(BaseAgent):
         Args:
             models (list[str]): The models as a list.
         """
-        print(f"TOOL Merging models")
+        logger.error(f"COMPOSING MODEL: {models}")
         code = agent.context.get_code("model_compose", {"models": models})
         loop.set_state(loop.STOP_SUCCESS)
         return json.dumps(

@@ -48,7 +48,7 @@ class MiraModelEditContext(BaseContext):
         else:
             item_id = context_info["id"][0]
             item_type = context_info.get("type", "model")
-            print(f"Processing {item_type} AMR {item_id} as a MIRA model")
+            logger.error(f"Processing {item_type} AMR {item_id} as a MIRA model")
             await self.set_model(
                 item_id, item_type, parent_header=parent_header
             )
@@ -70,7 +70,7 @@ class MiraModelEditContext(BaseContext):
                     }),
                 ]
             )
-            print(f"Running command:\n-------\n{command}\n---------")
+            logger.error(f"Running command:\n-------\n{command}\n---------")
             await self.execute(command)
             self.models.append(self.var_name)
 
