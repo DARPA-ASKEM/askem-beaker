@@ -45,20 +45,20 @@ class MiraModelEditContext(BaseContext):
             await self.set_model(
                 item_id, item_type, parent_header=parent_header
             )
-        elif len(self.config["context_info"]["id"]) == 1:
+        else:
             item_id = context_info["id"][0]
             item_type = context_info.get("type", "model")
             print(f"Processing {item_type} AMR {item_id} as a MIRA model")
             await self.set_model(
                 item_id, item_type, parent_header=parent_header
             )
-        else:
-            await self.load_models()
-            pass
+            if len(self.config["context_info"]["id"]) > 1:
+                await self.load_models()
+
 
     async def load_models(self):
         self.models = []
-        for model_id in self.context_info["id"]:
+        for model_id in self.config["context_info"]["id"]:
             model_url = f"{os.environ['HMI_SERVER_URL']}/models/{model_id}"
             command = "\n".join(
                 [
@@ -572,6 +572,7 @@ class MiraModelEditContext(BaseContext):
     @intercept
     async def merge_models(self, message):
 
+        print(f"INTERCEPT Merging models")
         code = self.get_code("merge_models", {
             "models": self.models
         })

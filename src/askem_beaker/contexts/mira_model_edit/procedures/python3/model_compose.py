@@ -1,1 +1,2 @@
-model = compose({{ models }})
+print(f"COMPOSING MODEL: {{models}}")
+model = compose("{{models}}")
