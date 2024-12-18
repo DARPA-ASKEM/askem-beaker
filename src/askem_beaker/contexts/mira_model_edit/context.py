@@ -557,9 +557,9 @@ class MiraModelEditContext(BaseContext):
 		    "key": key,
 		    "strata": strata,
 		    "concepts_to_stratify": concepts_to_stratify,
-			  "concepts_to_preserve": concepts_to_preserve,
+		    "concepts_to_preserve": concepts_to_preserve,
 		    "params_to_stratify": params_to_stratify,
-			  "params_to_preserve": params_to_preserve,
+		    "params_to_preserve": params_to_preserve,
 		    "cartesian_control": cartesian_control,
 		    "structure": structure
 		})
