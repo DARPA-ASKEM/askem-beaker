@@ -548,6 +548,7 @@ class MiraModelEditContext(BaseContext):
 		strata = content.get("strata")
 		concepts_to_stratify = content.get("concepts_to_stratify")
 		params_to_stratify = content.get("params_to_stratify")
+		params_to_preserve = content.get("params_to_preserve")
 		cartesian_control = content.get("cartesian_control")
 		structure = content.get("structure")
 
@@ -556,6 +557,7 @@ class MiraModelEditContext(BaseContext):
 		    "strata": strata,
 		    "concepts_to_stratify": concepts_to_stratify,
 		    "params_to_stratify": params_to_stratify,
+			"params_to_preserve": params_to_preserve,
 		    "cartesian_control": cartesian_control,
 		    "structure": structure
 		})
