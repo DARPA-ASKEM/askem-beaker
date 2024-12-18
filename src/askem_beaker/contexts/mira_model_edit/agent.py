@@ -126,6 +126,50 @@ class MiraModelEditAgent(BaseAgent):
                 "content": code.strip(),
             }
         )
+    
+    @tool()
+    async def add_observable_pattern(self, new_name: str, 
+                                     identifier_keys: list[str], 
+                                     identifier_values: list[str],
+                                     context_keys: list[str],
+                                     context_values: list[str],
+                                     agent: AgentRef, 
+                                     loop: LoopControllerRef):
+        """
+        This tool is used when a user wants to add an observable via a complex pattern. You should inspect the model BEFORE using this tool
+        so that you can properly map the users request to the correct identifiers and contexts in the model. Typically the identifier key
+        will be something like "ido" and the identifier value will be something like "0000514". Context keys will be the name of the strata context (e.g. "Age")
+        and the values will be the value for that strata context (e.g. "youth"). 
+
+        When the user specifies a high level state (such as Infected) this would be specified via the identifiers; when the user specifies 
+        a strata (such as "youth") that is specified via the context.
+
+        Args:
+            new_name (str): The new name provided for the observable. If this is not provided something intuitive should be set.
+            identifier_keys (list[str]): The keys for the identifiers that will be used in the observable.
+            identifier_values (list[str]): The values for the identifiers that will be used in the observable.
+            context_keys (list[str]): The keys for the context that will be used in the observable.
+            context_values (list[str]): The values for the context that will be used in the observable.
+        """
+        identifier_dict = dict(zip(identifier_keys, identifier_values))
+        context_dict = dict(zip(context_keys, context_values))
+        code = agent.context.get_code("add_observable_pattern", 
+                                      {"new_name": new_name,
+                                       "identifier_keys": identifier_keys,
+                                       "identifier_values": identifier_values,
+                                       "context_keys": context_keys,
+                                       "context_values": context_values,
+                                       "identifier_dict": identifier_dict,
+                                       "context_dict": context_dict}
+                                      )
+        loop.set_state(loop.STOP_SUCCESS)
+        return json.dumps(
+            {
+                "action": "code_cell",
+                "language": "python3",
+                "content": code.strip(),
+            }
+        )    
 
     @tool()
     async def remove_observable(self, remove_id: str, agent: AgentRef, loop: LoopControllerRef):
@@ -502,7 +546,11 @@ class MiraModelEditAgent(BaseAgent):
         structure: Optional[Iterable[Tuple[str, str]]] = None,
         directed: bool = False,
         cartesian_control: bool = False,
-        modify_names: bool = True
+        modify_names: bool = True,
+        concepts_to_stratify: Optional[Collection[str]] = None,
+        concepts_to_preserve: Optional[Collection[str]] = None,
+        params_to_stratify: Optional[Collection[str]] = None,
+        params_to_preserve: Optional[Collection[str]] = None
     ):
         """
         This tool is used when a user wants to stratify a model.
@@ -525,6 +573,8 @@ class MiraModelEditAgent(BaseAgent):
                 An iterable of pairs corresponding to a directed network structure
                 where each of the pairs has two strata. If none given, will assume a complete
                 network structure. If no structure is necessary, pass an empty list.
+                For example [["Young", "Old"]] would mean that the population in Young can interact with the population in Old provided they are within the same state.
+                [["Toronto", "New York"], ["New York", "Toronto"]] would mean that the population in Toronto and New York can interact with each other provided they are in the same state.
                 By default this should be an empty list.
             directed (bool):
                 If the structure tuples are combinations this should be True. If they are permutations this should be false.
@@ -555,6 +605,22 @@ class MiraModelEditAgent(BaseAgent):
                 (e.g., ``"S"`` becomes ``"S_boston"``). If false, will keep the original
                 names.
                 If this cannot be found it should default to True
+            concepts_to_stratify (Optional): 
+                This is a list of the state variables in the model that is required to be stratified.
+                For example, given a model with state variables ("S", "E", "I", "R") and a request to only stratify the "S" state variable, the value of this argument should be ["S"].
+                If the request does not specify any state variable to stratify in particular, then the value of this argument should default to None.
+            concepts_to_preserve (Optional): 
+                This is a list of the state variables in the model that must not be stratified.
+                For example, given a model with state variables ("S", "E", "I", "R") and a request like "preserve" or "do not stratify" the "S" state variable, the value of this argument should be ["S"].
+                If the request does not specify any state variable to not be stratified or preserved in particular, then the value of this argument should default to None.
+            params_to_stratify (Optional):
+                This is a list of the parameters in the model that is required to be stratified.
+                For example, given a model with parameters ("beta", "gamma") and a request to only stratify the "beta" parameter, the value of this argument should be ["beta"].
+                If the request does not specify any parameter to stratify in particular, then the value of this argument should default to None.
+            params_to_preserve (Optional):
+                This is a list of the parameters in the model that must not be stratified.
+                For example, given a model with parameters ("beta", "gamma") and a request like "preserve" or "do not stratify" the "beta" parameter, the value of this argument should be ["beta"].
+                If the request does not specify any parameter to not be stratified or preserved in particular, then the value of this argument should default to None.
         """
 
         code = agent.context.get_code("stratify", {
@@ -563,7 +629,11 @@ class MiraModelEditAgent(BaseAgent):
             "structure": structure,
             "directed": directed,
             "cartesian_control": cartesian_control,
-            "modify_names": modify_names
+            "modify_names": modify_names,
+            "concepts_to_stratify": concepts_to_stratify,
+            "concepts_to_preserve": concepts_to_preserve,
+            "params_to_stratify": params_to_stratify,
+            "params_to_preserve": params_to_preserve
         })
         loop.set_state(loop.STOP_SUCCESS)
         return json.dumps(
