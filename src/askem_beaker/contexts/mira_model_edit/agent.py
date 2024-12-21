@@ -112,10 +112,14 @@ class MiraModelEditAgent(BaseAgent):
         """
         This tool is used when a user wants to add an observable.
 
+        Always make sure that template_expression is the string representation of a mathematical expression that can be parsed by SymPy.
+        If the user provides a math expression containing the operator "^", replace it with "**".
+        If the user provides an equation, pick the right hand side expression.
+
         Args:
             new_id (str): The new ID provided for the observable. If this is not provided the value for new_name should be used
             new_name (str): The new name provided for the observable. If this is not provided for the new_id should be used.
-            new_expression (str): The expression that the observable represents.
+            new_expression (str): The math expression that represents the observable as a function.
         """
         code = agent.context.get_code("add_observable", {"new_id": new_id, "new_name": new_name, "new_expression": new_expression})
         loop.set_state(loop.STOP_SUCCESS)
@@ -204,21 +208,25 @@ class MiraModelEditAgent(BaseAgent):
         agent: AgentRef, loop: LoopControllerRef):
         """
         This tool is used when a user wants to add a natural conversion to the model.
-        A natural conversion is a template that contains two states and a transition where one state is sending population to the transition and one state is recieving population from the transition.
+        A natural conversion is a template that contains two states and a transition where one state is sending population to the transition and one state is receiving population from the transition.
         The transition rate may only depend on the subject state.
 
         An example of this would be "Add a new transition from S to R with the name vaccine with the rate of v"
         Where S is the subject state, R is the outcome state, vaccine is the template_name, and v is the template_expression.
 
+        Always make sure that template_expression is the string representation of a mathematical expression that can be parsed by SymPy.
+        If the user provides a math expression containing the operator "^", replace it with "**".
+        If the user provides an equation, pick the right hand side expression.
+
         Args:
             subject_name (str): The state name that is the source of the new transition. This is the state population comes from.
-            subject_initial_value (float): The number assosiated with the subject state at its first step in time. If not known or not specified the default value of `1` should be used.
+            subject_initial_value (float): The number associated with the subject state at its first step in time. If not known or not specified the default value of `1` should be used.
             outcome_name (str): the state name that is the new transition's outputs. This is the state population moves to.
-            outcome_initial_value (float): The number assosiated with the output state at its first step in time. If not known or not specified the default value of `1` should be used.
+            outcome_initial_value (float): The number associated with the output state at its first step in time. If not known or not specified the default value of `1` should be used.
             parameter_name (str): the name of the parameter.
-            parameter_units (str): The units assosiated with the parameter.
+            parameter_units (str): The units associated with the parameter.
             parameter_value (float): This is a numeric value provided by the user. If not known or not specified the default value of `1` should be used.
-            parameter_description (str): The description assosiated with the parameter. If not known or not specified the default value of `` should be used
+            parameter_description (str): The description associated with the parameter. If not known or not specified the default value of `` should be used
             template_expression (str): The mathematical rate law for the transition.
             template_name (str): the name of the transition.
         """
@@ -261,23 +269,27 @@ class MiraModelEditAgent(BaseAgent):
         agent: AgentRef, loop: LoopControllerRef):
         """
         This tool is used when a user wants to add a controlled conversion to the model.
-        A controlled conversion is a template that contains two states and a transition where one state is sending population to the transition and one state is recieving population from the transition.
+        A controlled conversion is a template that contains two states and a transition where one state is sending population to the transition and one state is receiving population from the transition.
         This transition rate depends on a controller state. This controller state can be an existing or new state in the model.
 
         An example of this would be "Add a new transition from S to R with the name vaccine with the rate of v. v depends on I"
         Where S is the subject state, R is the outcome state, vaccine is the template_name, and v is the template_expression and I is the controller_name.
 
+        Always make sure that template_expression is the string representation of a mathematical expression that can be parsed by SymPy.
+        If the user provides a math expression containing the operator "^", replace it with "**".
+        If the user provides an equation, pick the right hand side expression.
+
         Args:
             subject_name (str): The state name that is the source of the new transition. This is the state population comes from.
-            subject_initial_value (float): The number assosiated with the subject state at its first step in time. If not known or not specified the default value of `1` should be used.
+            subject_initial_value (float): The number associated with the subject state at its first step in time. If not known or not specified the default value of `1` should be used.
             outcome_name (str): the state name that is the new transition's outputs. This is the state population moves to.
-            outcome_initial_value (float): The number assosiated with the output state at its first step in time. If not known or not specified the default value of `1` should be used.
+            outcome_initial_value (float): The number associated with the output state at its first step in time. If not known or not specified the default value of `1` should be used.
             controller_name (str): The name of the controller state. This is the state that will impact the transition's rate.
             controller_initial_value (float): The initial value of the controller.
             parameter_name (str): the name of the parameter.
-            parameter_units (str): The units assosiated with the parameter.
+            parameter_units (str): The units associated with the parameter.
             parameter_value (float): This is a numeric value provided by the user. If not known or not specified the default value of `1` should be used.
-            parameter_description (str): The description assosiated with the parameter. If not known or not specified the default value of `` should be used
+            parameter_description (str): The description associated with the parameter. If not known or not specified the default value of `` should be used
             template_expression (str): The mathematical rate law for the transition.
             template_name (str): the name of the transition.
         """
@@ -317,19 +329,31 @@ class MiraModelEditAgent(BaseAgent):
         template_name: str,
         agent: AgentRef, loop: LoopControllerRef):
         """
-        This tool is used when a user wants to add a natural production to the model.
-        A natural production is a template that contains one state which is recieving population by one transition. The transition will not depend on any state.
+        This tool is used when a user wants to add a natural production transition to the model.
+        A natural-production transition is a template that contains only one concept or state:
+          - there is only an outcome
+          - there are no subject or controller(s)
+          - the outcome is the state variable representing a population that grows at some constant rate
+        
+        An example of a natural-production transition is the natural birth of a population of humans susceptible to an infectious disease:
+          - the user request could be "add a natural birth process for the state 'Susceptible_humans' at a rate of 'b'"
+          - outcome_name = "Susceptible_humans"
+          - parameter_name = "b"
+          - parameter_description = "Natural birth rate of susceptible humans"
+          - template_expression = "b"
+          - template_name = "Natural Birth of Susceptible Humans"
 
-        An example of this would be "Add a new transition from the transition rec to S with a rate of f."
-        Where S is the outcome state, rec is the template_name, and f is the template_expression
+        Always make sure that template_expression is the string representation of a mathematical expression that can be parsed by SymPy.
+        If the user provides a math expression containing the operator "^", replace it with "**".
+        If the user provides an equation, pick the right hand side expression.
 
         Args:
             outcome_name (str): the state name that is the new transition's outputs. This is the state population moves to.
-            outcome_initial_value (float): The number assosiated with the output state at its first step in time. If not known or not specified the default value of `1` should be used.
+            outcome_initial_value (float): The number associated with the output state at its first step in time. If not known or not specified the default value of `1` should be used.
             parameter_name (str): the name of the parameter.
-            parameter_units (str): The units assosiated with the parameter.
-            parameter_value (float): This is a numeric value provided by the user. If not known or not specified the default value of `1` should be used.
-            parameter_description (str): The description assosiated with the parameter. If not known or not specified the default value of `` should be used
+            parameter_units (str): The units associated with the parameter.
+            parameter_value (float): This is a numeric value provided by the user. If not known or not specified the default value of `0` should be used.
+            parameter_description (str): The description associated with the parameter. If not known or not specified the default value of `` should be used
             template_expression (str): The mathematical rate law for the transition.
             template_name (str): the name of the transition.
         """
@@ -368,20 +392,35 @@ class MiraModelEditAgent(BaseAgent):
         agent: AgentRef, loop: LoopControllerRef):
         """
         This tool is used when a user wants to add a controlled production to the model.
-        A controlled production is a template that contains one state which is recieving population by one transition. This transition rate depends on a controller state. This controller state can be an existing or new state in the model.
+        A controlled production is a template that contains two concepts or state variables: 
+          - the outcome represents a population that grows due to this transition
+          - the controller represents a second population upon which the growth rate depends
 
-        An example of this would be "Add a new transition from the transition rec to S with a rate of f. f depends on R. "
-        Where S is the outcome state, rec is the template_name, f is the template_expression and the controller is R.
+        One example of a controlled-production transition is the shedding of viral particles from a population of infected people into wastewater:
+          - The user request could be "add a new transition named 'viral shedding' to the state 'ViralLoad' with rate law 'alpha * Infected'"
+          - "ViralLoad" is the outcome_name, "Infected" is the controller_name, "viral shedding" is the template_name, "Infected" is the controller_name, "alpha" is the parameter_name, and "alpha * Infected" is the template_expression.
+
+        Another example of a controlled-production transition is to model the cumulative sum of a population over time:
+          - The user request could be "create a cumulative sum of the state variable 'Infected' and name it 'InfectedCumSum"
+          - outcome_name = "InfectedCumSum"
+          - controller_name = "Infected"
+          - template_name = "CumSum of Infected"
+          - there is no parameter
+          - template_expression = "Infected"
+
+        Always make sure that template_expression is the string representation of a mathematical expression that can be parsed by SymPy.
+        If the user provides a math expression containing the operator "^", replace it with "**".
+        If the user provides an equation, pick the right hand side expression.
 
         Args:
-            outcome_name (str): the state name that is the new transition's outputs. This is the state population moves to.
-            outcome_initial_value (float): The number assosiated with the output state at its first step in time. If not known or not specified the default value of `1` should be used.
+            outcome_name (str): the name of the concept that is the outcome of the new transition.
+            outcome_initial_value (float): The number associated with the output state at its first step in time. If not known or not specified the default value of `1` should be used.
             controller_name (str): The name of the controller state. This is the state that will impact the transition's rate.
             controller_initial_value (float): The initial value of the controller.
             parameter_name (str): the name of the parameter.
-            parameter_units (str): The units assosiated with the parameter.
-            parameter_value (float): This is a numeric value provided by the user. If not known or not specified the default value of `1` should be used.
-            parameter_description (str): The description assosiated with the parameter. If not known or not specified the default value of `` should be used
+            parameter_units (str): The units associated with the parameter.
+            parameter_value (float): This is a numeric value provided by the user. If unknown or unspecified, the default value of `1` should be used.
+            parameter_description (str): The description associated with the parameter. If unknown or unspecified, the default value of `` should be used
             template_expression (str): The mathematical rate law for the transition.
             template_name (str): the name of the transition.
         """
@@ -419,19 +458,37 @@ class MiraModelEditAgent(BaseAgent):
         template_name: str,
         agent: AgentRef, loop: LoopControllerRef):
         """
-        This tool is used when a user wants to add a natural degradation to the model.
-        A natural degradation is a template that contains one state in which the population is leaving through one transition. The transition may only depend on the subject state.
+        This tool is used when a user wants to add a natural degradation transition to the model.
+        A natural-degradation transition is a template that contains only one concept or state:
+          - there is only an subject
+          - there are no outcome or controller(s)
+          - the subject is the state variable representing a population that decays or dies at some rate proportional to the population itself
+          - the parameter is the degradation or decay rate
+        
+        An example of a natural-degradation transition is the natural death of a population of living organisms:
+          - the user request could be "add a natural death process for the state 'Recovered_humans' at a rate of 'c'"
+          - subject_name = "Recovered_humans"
+          - parameter_name = "c"
+          - parameter_description = "Natural death rate of recovered humans"
+          - template_expression = "c * Recovered_humans"
+          - template_name = "Natural Death of Recovered Humans"
 
-        An example of this would be "Add a new transition from state S to transition rec with a rate of v."
-        Where S is the subject state, rec is the template_name, and v is the template_expression.
+        Other examples of natural degradation are radioactive decay of atomic nuclei and any other processes that can be modelled as an exponential decay.
+
+        If the user provides a "lifetime" instead of a decay rate, then the parameter of the natural-degradation transition is this "lifetime" and the template_expression is "(1 / lifetime) * subject_name".        
+        If the user provides a "half-life", then the parameter is this "halflife" and the template_expression is "0.301 / halflife * subject_name".
+
+        Always make sure that template_expression is the string representation of a mathematical expression that can be parsed by SymPy.
+        If the user provides a math expression containing the operator "^", replace it with "**".
+        If the user provides an equation, pick the right hand side expression.
 
         Args:
             subject_name (str): the state name that is the new transition's outputs. This is the state population moves to.
-            subject_initial_value (float): The number assosiated with the output state at its first step in time. If not known or not specified the default value of `1` should be used.
+            subject_initial_value (float): The number associated with the output state at its first step in time. If not known or not specified the default value of `1` should be used.
             parameter_name (str): the name of the parameter.
-            parameter_units (str): The units assosiated with the parameter.
+            parameter_units (str): The units associated with the parameter.
             parameter_value (float): This is a numeric value provided by the user. If not known or not specified the default value of `1` should be used.
-            parameter_description (str): The description assosiated with the parameter. If not known or not specified the default value of `` should be used
+            parameter_description (str): The description associated with the parameter. If not known or not specified the default value of `` should be used
             template_expression (str): The mathematical rate law for the transition.
             template_name (str): the name of the transition.
         """
@@ -470,20 +527,33 @@ class MiraModelEditAgent(BaseAgent):
         agent: AgentRef, loop: LoopControllerRef):
         """
         This tool is used when a user wants to add a controlled degradation to the model.
-        A controlled degradation is a template that contains one state in which the population is leaving through one transition. This transition rate depends on a controller state. This controller state can be an existing or new state in the model.
+        A controlled degradation transition is similar to the natural degradation transition:
+          - it only has a subject
+          - it has no outcome
+          - it does have a controller unlike a natural degradation
 
-        An example of this would be "Add a new transition from S to rec with a rate of v. v depends on R."
-        Where S is the subject state, rec is the template_name, v is the template_expression and R is the controller state.
+        An example of a controlled degradation transition is predation or the decrease of a prey population caused by a predator population
+          - the user request could be "add a death process to the 'Rabbit' caused by 'Wolf' at a rate of 'beta' = 0.01"
+          - template_name = "Death of Rabbits caused by Wolf"
+          - template_expression = "beta * Rabbit * Wolf"
+          - subject_name = "Rabbit"
+          - controller_name = "Wolf"
+          - parameter_name = "beta"
+          - parameter_value = "0.01"
 
+        Always make sure that template_expression is the string representation of a mathematical expression that can be parsed by SymPy.
+        If the user provides a math expression containing the operator "^", replace it with "**".
+        If the user provides an equation, pick the right hand side expression
+        
         Args:
             subject_name (str): the state name that is the new transition's outputs. This is the state population moves to.
-            subject_initial_value (float): The number assosiated with the output state at its first step in time. If not known or not specified the default value of `1` should be used.
+            subject_initial_value (float): The number associated with the output state at its first step in time. If not known or not specified the default value of `1` should be used.
             controller_name (str): The name of the controller state. This is the state that will impact the transition's rate.
             controller_initial_value (float): The initial value of the controller.
             parameter_name (str): the name of the parameter.
-            parameter_units (str): The units assosiated with the parameter.
+            parameter_units (str): The units associated with the parameter.
             parameter_value (float): This is a numeric value provided by the user. If not known or not specified the default value of `1` should be used.
-            parameter_description (str): The description assosiated with the parameter. If not known or not specified the default value of `` should be used
+            parameter_description (str): The description associated with the parameter. If not known or not specified the default value of `` should be used
             template_expression (str): The mathematical rate law for the transition.
             template_name (str): the name of the transition.
         """
@@ -516,11 +586,16 @@ class MiraModelEditAgent(BaseAgent):
         agent: AgentRef, loop: LoopControllerRef
     ):
         """
-        This tool is used when a user wants to replace a ratelaw.
+        This tool is used when a user wants to replace a rate law.
+        
+        An example of this would be "change the rate law of the 'infection' template to 'S * I * beta / N'"
+          - template_name = "infection"
+          - new_rate_law = "S * I * beta / N"
 
-        An example of this would be "change rate law of inf to S * I * z"
-        Where inf is the template_name and "S * I * z" is the new_rate_law
-
+        Always make sure that new_rate_law is the string representation of a mathematical expression that can be parsed by SymPy.
+        If the user provides a math expression containing the operator "^", replace it with "**".
+        If the user provides an equation, pick the right hand side expression
+        
         Args:
             template_name (str): This is the name of the template that has the rate law.
             new_rate_law (str): This is the mathematical expression used to determine the rate law.
