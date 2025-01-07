@@ -65,6 +65,8 @@ You may be asked to assist in converting incidence data to prevalence data. In t
 
 {incidence_to_prevalence}
 
+Always use .loc[] when setting values in a filtered dataframe - it's clearer and safer than working with a view/copy.
+
 Please generate the code as if you were programming inside a Jupyter Notebook and the code is to be executed inside a cell.
 You MUST wrap the code with a line containing three backticks (```) before and after the generated code.
 No addtional text is needed in the response, just the code block.
