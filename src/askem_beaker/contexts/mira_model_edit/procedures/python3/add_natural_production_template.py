@@ -1,25 +1,26 @@
+# Define state variables
 concepts_name_map = model.get_concepts_name_map()
-if "{{ outcome_name }}" not in concepts_name_map:
-    outcome_concept = Concept(name = "{{ outcome_name }}")
-else:
+initials = {}
+if "{{ outcome_name }}" in concepts_name_map:
     outcome_concept = concepts_name_map.get("{{ outcome_name }}")
+else:
+    outcome_concept = Concept(name = "{{ outcome_name }}")
+    initials["{{outcome_name }}"] = Initial(concept = outcome_concept, expression = sympy.Float({{outcome_initial_value }}))
 
-if "{{ parameter_name}}" not in model.parameters: #note this is checks for paremeter's symbol
-    parameter_unit = Unit(expression = sympy.Symbol("{{ parameter_units}}"))
-    parameters = {
-        "{{ parameter_name}}": Parameter(name = "{{ parameter_name}}", value = {{ parameter_value }}, units = parameter_unit, description = "{{ parameter_description}}")
-    }
+
+# Define parameters
+parameters = {}
+if "{{ parameter_name}}" in model.parameters: #note this is checks for paremeter's symbol
+    parameters["{{ parameter_name}}"] = model.parameters.get("{{ parameter_name}}")
 else: 
-    parameters = {"{{ parameter_name}}": model.parameters.get("{{ parameter_name}}")}
+    parameters["{{ parameter_name}}"] = Parameter(name = "{{ parameter_name}}", value = {{ parameter_value }}, description = "{{ parameter_description}}")
 
-initials = { 
-    "{{outcome_name }}": Initial(concept = outcome_concept, expression = sympy.Float({{outcome_initial_value }}))
-}
 
+# Add process as new template to the model
 model = model.add_template(
     template = NaturalProduction(
         outcome = outcome_concept,
-        rate_law = safe_parse_expr("{{ template_expression }}", local_dict=_clash),
+        rate_law = safe_parse_expr("{{ template_expression }}", local_dict = _clash),
         name = "{{ template_name }}"
     ),
     parameter_mapping = parameters,
