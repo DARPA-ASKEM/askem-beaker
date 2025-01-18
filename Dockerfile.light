@@ -19,13 +19,13 @@ RUN apt-get install -y build-essential make gcc g++ git gfortran npm \
 ENV CPLUS_INCLUDE_PATH=/usr/include/gdal
 ENV C_INCLUDE_PATH=/usr/include/gdal
 
-# Install Rust and Cargo
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-ENV PATH="/root/.cargo/bin:${PATH}"
-
 # Switch to non-root user. It is crucial for security reasons to not run jupyter as root user!
 RUN useradd -m jupyter
 USER jupyter
+
+# Install Rust and Cargo
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+ENV PATH="/root/.cargo/bin:${PATH}"
 
 # Install PyCIEMSS from GitHub
 RUN pip install --no-cache-dir git+https://github.com/ciemss/pyciemss.git@adeb6b974746f86b20597e3d037041121e8ac9c9 --use-pep517
