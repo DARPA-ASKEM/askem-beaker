@@ -1,32 +1,33 @@
+# Define state variables
 concepts_name_map = model.get_concepts_name_map()
-if "{{ subject_name }}" not in concepts_name_map:
-    subject_concept = Concept(name = "{{ subject_name }}")
-else:
+initials = {}
+if "{{ subject_name }}" in concepts_name_map:
     subject_concept = concepts_name_map.get("{{ subject_name }}")
-
-if "{{controller_name}}" not in concepts_name_map:
-    controller_concept = Concept(name = "{{controller_name}}")
 else:
+    subject_concept = Concept(name = "{{ subject_name }}")
+    initials["{{subject_name }}"] = Initial(concept = outcome_concept, expression = sympy.Float({{subject_initial_value }}))
+
+if "{{controller_name}}" in concepts_name_map:
     controller_concept = concepts_name_map.get("{{controller_name}}")
+else:
+    controller_concept = Concept(name = "{{controller_name}}")
+    initials["{{controller_name }}"] = Initial(concept = controller_concept, expression = sympy.Float({{controller_initial_value }}))
 
-if "{{ parameter_name}}" not in model.parameters: #note this is checks for paremeter's symbol
-    parameter_unit = Unit(expression = sympy.Symbol("{{ parameter_units}}"))
-    parameters = {
-        "{{ parameter_name}}": Parameter(name = "{{ parameter_name}}", value = {{ parameter_value }}, units = parameter_unit, description = "{{ parameter_description}}")
-    }
+
+# Define parameters
+parameters = {}
+if "{{ parameter_name}}" in model.parameters: #note this is checks for paremeter's symbol
+    parameters["{{ parameter_name}}"] = model.parameters.get("{{ parameter_name}}")
 else: 
-    parameters = {"{{ parameter_name}}": model.parameters.get("{{ parameter_name}}")}
+    parameters["{{ parameter_name}}"] = Parameter(name = "{{ parameter_name}}", value = {{ parameter_value }}, description = "{{ parameter_description}}")
 
-initials = { 
-    "{{subject_name }}": Initial(concept = subject_concept, expression = sympy.Float({{subject_initial_value }})),
-    "{{controller_name}}": Initial(concept = controller_concept, expression = sympy.Float({{controller_initial_value }}))
-}
 
+# Add process as new template to the model
 model = model.add_template(
     template = ControlledDegradation(
         subject = subject_concept,
         controller = controller_concept,
-        rate_law = safe_parse_expr("{{ template_expression }}", local_dict=_clash),
+        rate_law = safe_parse_expr("{{ template_expression }}", local_dict = _clash),
         name = "{{ template_name }}"
     ),
     parameter_mapping = parameters,
