@@ -31,9 +31,9 @@ ENV PATH="/root/.cargo/bin:${PATH}"
 RUN pip install --no-cache-dir git+https://github.com/ciemss/pyciemss.git@adeb6b974746f86b20597e3d037041121e8ac9c9 --use-pep517
 
 # Install MIRA from GitHub
-RUN git clone https://github.com/indralab/mira.git /home/jupyter/mira
+RUN git clone https://github.com/gyorilab/mira.git /home/jupyter/mira
 WORKDIR /home/jupyter/mira
-RUN git reset --hard 420832f132b1cebb30341a3fee1610a6542becef
+RUN git reset --hard 7c812607c18da2d77ed39a81594468370629506d
 
 RUN pip install --no-cache-dir /home/jupyter/mira/"[ode,tests,dkg-client,dkg-construct,sbml,docs]" && \
     rm -r /home/jupyter/mira
