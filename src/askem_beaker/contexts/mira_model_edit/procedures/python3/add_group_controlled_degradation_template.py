@@ -7,7 +7,7 @@ if "{{ subject_name }}" in concepts_name_map:
     subject_concept = concepts_name_map.get("{{ subject_name }}")
 else:
     subject_concept = Concept(name = "{{ subject_name }}")
-    initials["{{subject_name }}"] = Initial(concept = outcome_concept, expression = sympy.Float({{subject_initial_value }}))
+    initials["{{subject_name }}"] = Initial(concept = subject_concept, expression = sympy.Float({{subject_initial_value }}))
 
 for controller_name in "{{ controller_names }}":
     if controller_name in concepts_name_map:
