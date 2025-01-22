@@ -841,7 +841,197 @@ class MiraModelEditAgent(BaseAgent):
                 "content": code.strip() + "\n\n\n\n\n" + code2.strip(),
             }
         )
-    
+
+    @tool()
+    async def add_grouped_controlled_degradation_template(self,
+        subject_name: str,
+        subject_initial_value: float,
+        controller_names: list[str],
+        parameter_name: str,
+        parameter_units: str,
+        parameter_value: float,
+        parameter_description: str,
+        template_expression: str,
+        template_name: str,
+        agent: AgentRef, loop: LoopControllerRef):
+        """
+        This tool is used when a user wants to add a grouped controlled degradation to the model.
+        A grouped controlled degradation transition is similar to the natural degradation transition:
+          - it only has a subject
+          - it has no outcome
+          - it does have a list of controllers
+
+        An example of a grouped controlled degradation transition is predation or the decrease of a prey population caused by a predator population
+          - the user request could be "add a death process to the 'Rabbit' caused by 'Wolf', and 'Owl' 
+          - template_name = "Death of Rabbits caused by Wolf"
+          - template_expression = "beta * Rabbit * Wolf"
+          - subject_name = "Rabbit"
+          - controller_names = ["Wolf", "Owl"]
+          - parameter_name = "beta"
+          - parameter_value = "0.01"
+
+        Always make sure that template_expression is the string representation of a mathematical expression that can be parsed by SymPy.
+        If the user provides a math expression containing the operator "^", replace it with "**".
+        If the user provides an equation, pick the right hand side expression
+        
+        Args:
+            subject_name (str): the state names that is the new transition's outputs. This is the state population moves to.
+            subject_initial_value (float): The number associated with the output state at its first step in time. If not known or not specified the default value of `1` should be used.
+            controller_names (list[str]): The names of the controller states. These are the states that will impact the transition's rate.
+            parameter_name (str): the name of the parameter.
+            parameter_units (str): The units associated with the parameter.
+            parameter_value (float): This is a numeric value provided by the user. If not known or not specified the default value of `1` should be used.
+            parameter_description (str): The description associated with the parameter. If not known or not specified the default value of `` should be used
+            template_expression (str): The mathematical rate law for the transition.
+            template_name (str): the name of the transition.
+        """
+
+        code = agent.context.get_code("add_grouped_controlled_degradation_template", {
+            "subject_name": subject_name,
+            "subject_initial_value": subject_initial_value,
+            "controller_names": controller_names,
+            "parameter_name": parameter_name,
+            "parameter_units": parameter_units,
+            "parameter_value": parameter_value,
+            "parameter_description": parameter_description,
+            "template_expression": template_expression,
+            "template_name": template_name
+        })
+        loop.set_state(loop.STOP_SUCCESS)
+        return json.dumps(
+            {
+                "action": "code_cell",
+                "language": "python3",
+                "content": code.strip(),
+            }
+        )
+
+    @tool()
+    async def add_grouped_controlled_conversion_template(self,
+        subject_name: str,
+        subject_initial_value: float,
+        outcome_name: str,
+        outcome_initial_value: float,
+        controller_names: list[str],
+        parameter_name: str,
+        parameter_units: str,
+        parameter_value: float,
+        parameter_description: str,
+        template_expression: str,
+        template_name: str,
+        agent: AgentRef, loop: LoopControllerRef):
+        """
+        This tool is used when a user wants to add a grouped controlled conversion to the model.
+        A grouped controlled conversion is a template that contains two states and a transition where one state is sending population to the transition and one state is receiving population from the transition.
+        This transition rate depends on a controller state. This controller state can be an existing or new state in the model.
+
+        An example of this would be "Add a new transition from S to R with the name vaccine with the rate of v. v depends on I and S"
+        Where S is the subject state, R is the outcome state, vaccine is the template_name, and v is the template_expression and ["I","S"] are the controller_names.
+
+        Always make sure that template_expression is the string representation of a mathematical expression that can be parsed by SymPy.
+        If the user provides a math expression containing the operator "^", replace it with "**".
+        If the user provides an equation, pick the right hand side expression.
+
+        Args:
+            subject_name (str): The state name that is the source of the new transition. This is the state population comes from.
+            subject_initial_value (float): The number associated with the subject state at its first step in time. If not known or not specified the default value of `1` should be used.
+            outcome_name (str): the state name that is the new transition's outputs. This is the state population moves to.
+            outcome_initial_value (float): The number associated with the output state at its first step in time. If not known or not specified the default value of `1` should be used.
+            controller_names (list[str]): The names of the controller states. These are the states that will impact the transition's rate.
+            parameter_name (str): the name of the parameter.
+            parameter_units (str): The units associated with the parameter.
+            parameter_value (float): This is a numeric value provided by the user. If not known or not specified the default value of `1` should be used.
+            parameter_description (str): The description associated with the parameter. If not known or not specified the default value of `` should be used
+            template_expression (str): The mathematical rate law for the transition.
+            template_name (str): the name of the transition.
+        """
+
+        code = agent.context.get_code("add_grouped_controlled_conversion_template", {
+            "subject_name": subject_name,
+            "subject_initial_value": subject_initial_value,
+            "outcome_name": outcome_name,
+            "outcome_initial_value": outcome_initial_value,
+            "controller_names": controller_names,
+            "parameter_name": parameter_name,
+            "parameter_units": parameter_units,
+            "parameter_value": parameter_value,
+            "parameter_description": parameter_description,
+            "template_expression": template_expression,
+            "template_name": template_name
+        })
+        loop.set_state(loop.STOP_SUCCESS)
+        return json.dumps(
+            {
+                "action": "code_cell",
+                "language": "python3",
+                "content": code.strip(),
+            }
+        )
+
+    @tool()
+    async def add_controlled_production_template(self,
+        outcome_name: str,
+        outcome_initial_value: float,
+        controller_names: list[str],
+        parameter_name: str,
+        parameter_units: str,
+        parameter_value: float,
+        parameter_description: str,
+        template_expression: str,
+        template_name: str,
+        agent: AgentRef, loop: LoopControllerRef):
+        """
+        This tool is used when a user wants to add a controlled production to the model.
+        A group controlled production is a template that contains two concepts or state variables: 
+          - the outcome represents a population that grows due to this transition
+          - the controller represents a group of populations upon which the growth rate depends
+
+        An example of a group controlled production transition is to model the cumulative sum of a population over time:
+          - The user request could be "create a cumulative sum of the state variables 'Infected' and 'Recovered'. Name it 'cumulativeSum"
+          - outcome_name = "cumulativeSum"
+          - controller_names = ["Infected", "Recovered"]
+          - template_name = "cumulativeSum"
+          - there is no parameter
+          - template_expression = "Infected + Recovered"
+
+        Always make sure that template_expression is the string representation of a mathematical expression that can be parsed by SymPy.
+        If the user provides a math expression containing the operator "^", replace it with "**".
+        If the user provides an equation, pick the right hand side expression.
+
+        Args:
+            outcome_name (str): the name of the concept that is the outcome of the new transition.
+            outcome_initial_value (float): The number associated with the output state at its first step in time. If not known or not specified the default value of `1` should be used.
+            controller_names (list[str]): The names of the controller states. These are the states that will impact the transition's rate.
+            parameter_name (str): the name of the parameter.
+            parameter_units (str): The units associated with the parameter.
+            parameter_value (float): This is a numeric value provided by the user. If unknown or unspecified, the default value of `1` should be used.
+            parameter_description (str): The description associated with the parameter. If unknown or unspecified, the default value of `` should be used
+            template_expression (str): The mathematical rate law for the transition.
+            template_name (str): the name of the transition.
+        """
+
+        code = agent.context.get_code("add_grouped_controlled_production_template", {
+            "outcome_name": outcome_name,
+            "outcome_initial_value": outcome_initial_value,
+            "controller_names": controller_names,
+            "parameter_name": parameter_name,
+            "parameter_units": parameter_units,
+            "parameter_value": parameter_value,
+            "parameter_description": parameter_description,
+            "template_expression": template_expression,
+            "template_name": template_name
+        })
+        loop.set_state(loop.STOP_SUCCESS)
+        return json.dumps(
+            {
+                "action": "code_cell",
+                "language": "python3",
+                "content": code.strip(),
+            }
+        )
+
+ 
+
     @tool()
     async def generate_code(
         self, query: str, agent: AgentRef, loop: LoopControllerRef

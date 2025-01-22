@@ -9,7 +9,7 @@ else:
     subject_concept = Concept(name = "{{ subject_name }}")
     initials["{{subject_name }}"] = Initial(concept = outcome_concept, expression = sympy.Float({{subject_initial_value }}))
 
-for controller_name in "{{ controller_name_list }}":
+for controller_name in "{{ controller_names }}":
     if controller_name in concepts_name_map:
         controller_concept_list.append(concepts_name_map.get(controller_name))
     else:
