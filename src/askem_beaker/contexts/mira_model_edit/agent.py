@@ -843,7 +843,7 @@ class MiraModelEditAgent(BaseAgent):
         )
 
     @tool()
-    async def add_grouped_controlled_degradation_template(self,
+    async def add_group_controlled_degradation_template(self,
         subject_name: str,
         subject_initial_value: float,
         controller_names: list[str],
@@ -886,7 +886,7 @@ class MiraModelEditAgent(BaseAgent):
             template_name (str): the name of the transition.
         """
 
-        code = agent.context.get_code("add_grouped_controlled_degradation_template", {
+        code = agent.context.get_code("add_group_controlled_degradation_template", {
             "subject_name": subject_name,
             "subject_initial_value": subject_initial_value,
             "controller_names": controller_names,
@@ -907,7 +907,7 @@ class MiraModelEditAgent(BaseAgent):
         )
 
     @tool()
-    async def add_grouped_controlled_conversion_template(self,
+    async def add_group_controlled_conversion_template(self,
         subject_name: str,
         subject_initial_value: float,
         outcome_name: str,
@@ -946,7 +946,7 @@ class MiraModelEditAgent(BaseAgent):
             template_name (str): the name of the transition.
         """
 
-        code = agent.context.get_code("add_grouped_controlled_conversion_template", {
+        code = agent.context.get_code("add_group_controlled_conversion_template", {
             "subject_name": subject_name,
             "subject_initial_value": subject_initial_value,
             "outcome_name": outcome_name,
@@ -1010,7 +1010,7 @@ class MiraModelEditAgent(BaseAgent):
             template_name (str): the name of the transition.
         """
 
-        code = agent.context.get_code("add_grouped_controlled_production_template", {
+        code = agent.context.get_code("add_group_controlled_production_template", {
             "outcome_name": outcome_name,
             "outcome_initial_value": outcome_initial_value,
             "controller_names": controller_names,
