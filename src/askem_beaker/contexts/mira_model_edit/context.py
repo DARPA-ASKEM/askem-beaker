@@ -15,8 +15,8 @@ from .agent import MiraModelEditAgent
 from askem_beaker.utils import get_auth
 
 if TYPE_CHECKING:
-    from beaker_kernel.kernel import LLMKernel
-    from beaker_kernel.lib.subkernels.base import BaseSubkernel
+	from beaker_kernel.kernel import LLMKernel
+	from beaker_kernel.lib.subkernels.base import BaseSubkernel
 
 logger = logging.getLogger(__name__)
 
@@ -554,28 +554,28 @@ class MiraModelEditContext(BaseContext):
 		structure = content.get("structure")
 
 		stratify_code = self.get_code("stratify", {
-		    "key": key,
-		    "strata": strata,
-		    "concepts_to_stratify": concepts_to_stratify,
-		    "concepts_to_preserve": concepts_to_preserve,
-		    "params_to_stratify": params_to_stratify,
-		    "params_to_preserve": params_to_preserve,
-		    "cartesian_control": cartesian_control,
-		    "structure": structure
+			"key": key,
+			"strata": strata,
+			"concepts_to_stratify": concepts_to_stratify,
+			"concepts_to_preserve": concepts_to_preserve,
+			"params_to_stratify": params_to_stratify,
+			"params_to_preserve": params_to_preserve,
+			"cartesian_control": cartesian_control,
+			"structure": structure
 		})
 		stratify_result = await self.execute(stratify_code)
 
 		content = {
-		    "success": True,
-		    "executed_code": stratify_result["parent"].content["code"],
+			"success": True,
+			"executed_code": stratify_result["parent"].content["code"],
 		}
 
 		self.beaker_kernel.send_response(
-		    "iopub", "stratify_response", content, parent_header=message.header
+			"iopub", "stratify_response", content, parent_header=message.header
 		)
 		await self.send_mira_preview_message(parent_header=message.header)
 
-    @intercept()
+	@intercept()
 	async def add_group_controlled_conversion_template_request(self, message):
 		content = message.content
 
