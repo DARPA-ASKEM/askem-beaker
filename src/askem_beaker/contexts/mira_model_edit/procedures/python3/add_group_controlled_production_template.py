@@ -13,7 +13,8 @@ for controller_name in "{{ controller_names }}":
     if controller_name in concepts_name_map:
         controller_concept_list.append(concepts_name_map.get(controller_name))
     else:
-        controller_concept_list.append(Concept(name = controller_name))
+        controller_concept = Concept(name = controller_name)
+        controller_concept_list.append(controller_concept)
         initials[controller_name] = Initial(concept = controller_concept, expression = sympy.Float(1))
 
 # Define parameters
