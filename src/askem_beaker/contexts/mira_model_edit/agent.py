@@ -969,7 +969,7 @@ class MiraModelEditAgent(BaseAgent):
         )
 
     @tool()
-    async def add_controlled_production_template(self,
+    async def add_group_controlled_production_template(self,
         outcome_name: str,
         outcome_initial_value: float,
         controller_names: list[str],
@@ -981,7 +981,7 @@ class MiraModelEditAgent(BaseAgent):
         template_name: str,
         agent: AgentRef, loop: LoopControllerRef):
         """
-        This tool is used when a user wants to add a controlled production to the model.
+        This tool is used when a user wants to add a group controlled production to the model.
         A group controlled production is a template that contains two concepts or state variables: 
           - the outcome represents a population that grows due to this transition
           - the controller represents a group of populations upon which the growth rate depends
