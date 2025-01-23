@@ -5,7 +5,7 @@ import tempfile
 from json import JSONDecodeError
 
 with tempfile.TemporaryFile() as temp_csv_file:
-    {{ var_name|default("df") }}.to_csv(temp_csv_file, index=False, header=True)
+    {{ var_name|default("df") }}.to_csv(temp_csv_file, index=True, header=True)
     temp_csv_file.seek(0)
     # Set the HMI_SERVER endpoint
     hmi_server = "{{dataservice_url}}"
