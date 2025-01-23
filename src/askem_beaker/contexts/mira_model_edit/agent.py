@@ -535,7 +535,7 @@ class MiraModelEditAgent(BaseAgent):
         An example of a controlled degradation transition is predation or the decrease of a prey population caused by a predator population
           - the user request could be "add a death process to the 'Rabbit' caused by 'Wolf' at a rate of 'beta' = 0.01"
           - template_name = "Death of Rabbits caused by Wolf"
-          - template_expression = "beta * Rabbit * Wolf"
+          - template_expression = "beta * (Rabbit + Wolf)"
           - subject_name = "Rabbit"
           - controller_name = "Wolf"
           - parameter_name = "beta"
@@ -864,7 +864,7 @@ class MiraModelEditAgent(BaseAgent):
         An example of a grouped controlled degradation transition is predation or the decrease of a prey population caused by a predator population
           - the user request could be "add a death process to the 'Rabbit' caused by 'Wolf', and 'Owl' 
           - template_name = "Death of Rabbits caused by Wolf"
-          - template_expression = "beta * Rabbit * Wolf"
+          - template_expression = "beta * (Rabbit + Wolf + Owl)"
           - subject_name = "Rabbit"
           - controller_names = ["Wolf", "Owl"]
           - parameter_name = "beta"
