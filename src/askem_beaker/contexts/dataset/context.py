@@ -31,6 +31,7 @@ class DatasetContext(BaseContext):
         super().__init__(beaker_kernel, self.agent_cls, config)
 
     async def setup(self, context_info: dict, parent_header):
+        print("Tom -- Set up start:")
         self.config["context_info"] = context_info
         await self.set_assets(self.config["context_info"], parent_header=parent_header)
 
@@ -39,9 +40,11 @@ class DatasetContext(BaseContext):
         await self.send_df_preview_message(parent_header=message.parent_header)
 
     async def set_assets(self, assets, parent_header={}):
+        print("Tom -- Set assets: ")
         self.asset_map = assets
         for var_name, asset_item in assets.items():
             if isinstance(asset_item, str):
+                print("Tom -- in if")
                 asset_id = asset_item
                 asset_type = "dataset"
                 self.asset_map[var_name] = {
@@ -49,9 +52,11 @@ class DatasetContext(BaseContext):
                     "asset_type": asset_type,
                 }
             elif isinstance(asset_item, dict):
+                print("Tom -- else is instance")
                 asset_id = asset_item["id"]
                 asset_type = asset_item.get("asset_type", "dataset")
             else:
+                print("Tom -- unable to parse:")
                 raise ValueError("Unable to parse dataset mapping")
 
             meta_url = f"{os.environ['HMI_SERVER_URL']}/{asset_type}s/{asset_id}"
@@ -67,6 +72,7 @@ class DatasetContext(BaseContext):
         await self.send_df_preview_message(parent_header=parent_header)
 
     async def load_dataframes(self):
+        print("Tom -- load dataframes: ")
         var_map = {}
         for var_name, df_obj in self.asset_map.items():
             asset_type = df_obj.get("asset_type", "dataset")
@@ -113,6 +119,7 @@ class DatasetContext(BaseContext):
         return data
 
     async def update_asset_map(self, parent_header={}):
+        print("Tom -- update asset map")
         code = self.get_code("df_info")
         df_info_response = await self.evaluate(
             code,
