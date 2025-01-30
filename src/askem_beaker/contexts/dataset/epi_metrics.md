@@ -52,6 +52,24 @@ WIS measures how good a given forecast is relative to some observations. Large W
 Here is how you might calculate WIS:
 
 ```python
+def compute_quantile_dict(df: pd.DataFrame, outcome: str, quantiles: list) -> dict:
+    """
+    Compute the estimated quantiles from a time-series dataset with many samples.
+
+    Parameters
+    ------------
+    df: pandas.DataFrame
+        Dataset with columns named "timepoint_unknown" (contains timepoint values of given outcome variable) and an outcome variable name.
+    outcome: str
+        Name of the outcome variable for which the dataset is sampling over time
+    quantiles: iterable
+        List of alpha values for which quantiles are estimated from the sampled data points.
+    """
+    df_quantiles = df[['timepoint_unknown', outcome]].groupby('timepoint_unknown').quantile(q = quantiles).reorder_levels(order = [1, 0])
+    quantile_dict = {q: df_quantiles.loc[q].values.squeeze() for q in quantiles}
+
+    return quantile_dict
+
 # Interval Score
 def interval_score(
     observations,
