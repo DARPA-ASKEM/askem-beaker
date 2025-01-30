@@ -453,10 +453,10 @@ class MiraModelEditContext(BaseContext):
 	async def substitute_parameter_request(self, message):
 		content = message.content
 
-		parameter_id = content.get("parameter_id")
+		parameter_name = content.get("parameter_name")
 
 		code = self.get_code("substitute_parameter", {
-			"parameter_id": parameter_id,
+			"parameter_name": parameter_name,
 		})
 		result = await self.execute(code)
 		content = {
