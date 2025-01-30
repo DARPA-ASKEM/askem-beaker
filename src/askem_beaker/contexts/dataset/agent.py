@@ -15,13 +15,20 @@ logger = logging.Logger(__name__)
 
 # Specify the full path to the markdown file
 file_path = os.path.join(os.path.dirname(__file__), 'incidence_to_prevalence.md')
-
 with open(file_path, 'r') as file:
     incidence_to_prevalence = file.read()
+
+file_path = os.path.join(os.path.dirname(__file__), 'epi_metrics.md')
+with open(file_path, 'r') as file:
+    epi_metrics = file.read()
 
 class DatasetAgent(BaseAgent):
     """
     LLM Agent used to evaluate, modify, and display datasets in various languages.
+
+    When asked to convert data from incidence to prevalence or to calculate the Weighted Interval Score (WIS)
+    or Average Treatment Effect (ATE) you should use the `generate_code` tool which will have appropriate instructions
+    for the task.
     """
 
     def __init__(self, context: BaseContext = None, tools: list = None, **kwargs):
@@ -64,6 +71,10 @@ You also have access to the libraries {agent.context.metadata.get("libraries", "
 You may be asked to assist in converting incidence data to prevalence data. In that case, please follow the following instructions:
 
 {incidence_to_prevalence}
+
+You may be asked to assist in calculating epidemic metrics. In that case, please follow the following instructions:
+
+{epi_metrics}
 
 Always use .loc[] when setting values in a filtered dataframe - it's clearer and safer than working with a view/copy.
 
