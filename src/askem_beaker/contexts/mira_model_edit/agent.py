@@ -759,6 +759,52 @@ class MiraModelEditAgent(BaseAgent):
         )
 
     @tool()
+    async def remove_unsused_parameters(self, 
+        agent: AgentRef, loop: LoopControllerRef
+    ):
+        """
+        This tool is used when a user wants to remove all unused parameters from their model.
+        An example for this might look like "Remove all unused parameters"
+        """
+
+        code = agent.context.get_code("remove_unused_parameters", {})
+        loop.set_state(loop.STOP_SUCCESS)
+        return json.dumps(
+            {
+                "action": "code_cell",
+                "language": "python3",
+                "content": code.strip(),
+            }
+        )
+    
+    @tool()
+    async def substitute_parameter(self, 
+        parameter_name: str,
+        agent: AgentRef, 
+        loop: LoopControllerRef
+    ):
+        """
+        This tool is used when a user wants to remove a specified parameter from their model.
+        An example for this might look like: "Remove the parameter beta"
+
+        Args:
+            parameter_name (str): This is the name of the parameter the user wants to remove. 
+        """
+
+        code = agent.context.get_code("substitute_parameter", {
+            "parameter_name": parameter_name
+        })
+
+        loop.set_state(loop.STOP_SUCCESS)
+        return json.dumps(
+            {
+                "action": "code_cell",
+                "language": "python3",
+                "content": code.strip(),
+            }
+        )
+
+    @tool()
     async def change_rate_law_and_add_parameter(self,
         agent: AgentRef, loop: LoopControllerRef,
         template_name: str,
