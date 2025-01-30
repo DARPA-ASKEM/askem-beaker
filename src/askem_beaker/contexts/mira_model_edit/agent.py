@@ -779,8 +779,9 @@ class MiraModelEditAgent(BaseAgent):
     
     @tool()
     async def substitute_parameter(self, 
-        agent: AgentRef, loop: LoopControllerRef,
-        parameter_name: str
+        parameter_name: str,
+        agent: AgentRef, 
+        loop: LoopControllerRef
     ):
         """
         This tool is used when a user wants to remove a specified parameter from their model.
