@@ -434,6 +434,43 @@ class MiraModelEditContext(BaseContext):
 		await self.send_mira_preview_message(parent_header=message.header)
 
 	@intercept()
+	async def remove_unsued_parameters_request(self, message):
+		content = message.content
+
+		code = self.get_code("remove_unused_parameters", {})
+		result = await self.execute(code)
+		content = {
+			"success": True,
+			"executed_code": result["parent"].content["code"],
+		}
+
+		self.beaker_kernel.send_response(
+			"iopub", "remove_unused_parameters_response", content, parent_header=message.header
+		)
+		await self.send_mira_preview_message(parent_header=message.header)
+
+	@intercept()
+	async def substitute_parameter_request(self, message):
+		content = message.content
+
+		parameter_id = content.get("parameter_id")
+
+		code = self.get_code("substitute_parameter", {
+			"parameter_id": parameter_id,
+		})
+		result = await self.execute(code)
+		content = {
+			"success": True,
+			"executed_code": result["parent"].content["code"],
+		}
+
+		self.beaker_kernel.send_response(
+			"iopub", "substitute_parameter_response", content, parent_header=message.header
+		)
+		await self.send_mira_preview_message(parent_header=message.header)
+
+
+	@intercept()
 	async def update_parameter_request(self, message):
 		content = message.content
 
