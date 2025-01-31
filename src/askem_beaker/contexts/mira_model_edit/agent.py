@@ -759,7 +759,7 @@ class MiraModelEditAgent(BaseAgent):
         )
 
     @tool()
-    async def remove_unsused_parameters(self, 
+    async def remove_unused_parameters(self, 
         agent: AgentRef, loop: LoopControllerRef
     ):
         """
@@ -817,7 +817,7 @@ class MiraModelEditAgent(BaseAgent):
         units_mathml: str
     ):
         """
-        This tool is used when a user wants to replace a ratelaw and add a parameter to a model.
+        This tool is used when a user wants to replace a rate law and add a parameter to a model.
 
         If the parameter is specified as a distribution, the distribution arg should be a dictionary
         object that looks like
