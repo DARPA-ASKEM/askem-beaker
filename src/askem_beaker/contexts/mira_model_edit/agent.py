@@ -785,7 +785,7 @@ class MiraModelEditAgent(BaseAgent):
     ):
         """
         This tool is used when a user wants to remove a specified parameter from their model.
-        An example for this might look like: "Remove the parameter beta"
+        An example for this might look like: "Remove the parameter beta" or "Substitute the parameter beta with 1"
 
         Args:
             parameter_name (str): This is the name of the parameter the user wants to remove. 
