@@ -759,7 +759,7 @@ class MiraModelEditAgent(BaseAgent):
         )
 
     @tool()
-    async def remove_unsused_parameters(self, 
+    async def remove_unused_parameters(self, 
         agent: AgentRef, loop: LoopControllerRef
     ):
         """
@@ -817,7 +817,7 @@ class MiraModelEditAgent(BaseAgent):
         units_mathml: str
     ):
         """
-        This tool is used when a user wants to replace a ratelaw and add a parameter to a model.
+        This tool is used when a user wants to replace a rate law and add a parameter to a model.
 
         If the parameter is specified as a distribution, the distribution arg should be a dictionary
         object that looks like
@@ -1105,7 +1105,7 @@ and its structure.
 If you are asked to edit the model, you should try to use other tools for it. You can use the `replace_template_name`, `remove_template`, 
 `replace_state_name`, `add_observable`, `remove_observable`, `add_natural_conversion_template`, `add_controlled_conversion_template`, 
 `add_natural_production_template`, `add_controlled_production_template`, `add_natural_degradation_template`, `add_controlled_degradation_template`, 
-`replace_ratelaw`, `stratify`, `add_parameter`, `change_rate_law_and_add_parameter` tools to help with this.
+`replace_ratelaw`, `stratify`, `add_parameter`, `change_rate_law_and_add_parameter`, `remove_unused_parameters`, `substitute_parameter` tools to help with this.
 
 Please generate the code as if you were programming inside a Jupyter Notebook and the code is to be executed inside a cell.
 You MUST wrap the code with a line containing three backticks (```) before and after the generated code.
