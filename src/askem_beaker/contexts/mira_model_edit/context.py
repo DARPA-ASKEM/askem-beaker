@@ -160,6 +160,29 @@ class MiraModelEditContext(BaseContext):
 		await self.send_mira_preview_message(parent_header=message.header)
 
 	@intercept()
+	async def replace_parameter_name_request(self, message):
+		content = message.content
+
+		old_name = content.get("old_name")
+		new_name = content.get("new_name")
+
+		code = self.get_code("replace_parameter_name", {
+			"old_name": old_name,
+			"new_name": new_name
+		})
+		result = await self.execute(code)
+		content = {
+			"success": True,
+			"executed_code": result["parent"].content["code"],
+		}
+
+		self.beaker_kernel.send_response(
+			"iopub", "replace_parameter_name_response", content, parent_header=message.header
+		)
+		await self.send_mira_preview_message(parent_header=message.header)
+
+
+	@intercept()
 	async def add_natural_conversion_template_request(self, message):
 		content = message.content
 

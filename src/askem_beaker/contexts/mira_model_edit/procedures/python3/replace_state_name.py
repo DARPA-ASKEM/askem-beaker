@@ -1,4 +1,4 @@
-def replace_state_name(model , template_name: str, old_name: str, new_name: str) -> TemplateModel:
+def replace_state_name(model: TemplateModel, template_name: str, old_name: str, new_name: str) -> TemplateModel:
 
     """
     Given a TemplateModel model and the old & new name of a state/concept therein, 

@@ -108,6 +108,25 @@ class MiraModelEditAgent(BaseAgent):
         )
 
     @tool()
+    async def replace_parameter_name(self, old_name: str, new_name: str, agent: AgentRef, loop: LoopControllerRef):
+        """
+        This tool is used when a user wants to rename a parameter from an old name to a new name in every expression of the model that it is used.
+
+        Args:
+            old_name (str): The old/existing name of the parameter as it exists in the model before changing.
+            new_name (str): The name to which the parameter should be renamed.
+        """
+        code = agent.context.get_code("replace_parameter_name", {"old_name": old_name, "new_name": new_name})
+        loop.set_state(loop.STOP_SUCCESS)
+        return json.dumps(
+            {
+                "action": "code_cell",
+                "language": "python3",
+                "content": code.strip(),
+            }
+        )
+
+    @tool()
     async def add_observable(self, new_id: str, new_name: str, new_expression: str, agent: AgentRef, loop: LoopControllerRef):
         """
         This tool is used when a user wants to add an observable.
@@ -1105,7 +1124,9 @@ and its structure.
 If you are asked to edit the model, you should try to use other tools for it. You can use the `replace_template_name`, `remove_template`, 
 `replace_state_name`, `add_observable`, `remove_observable`, `add_natural_conversion_template`, `add_controlled_conversion_template`, 
 `add_natural_production_template`, `add_controlled_production_template`, `add_natural_degradation_template`, `add_controlled_degradation_template`, 
-`replace_ratelaw`, `stratify`, `add_parameter`, `change_rate_law_and_add_parameter`, `remove_unused_parameters`, `substitute_parameter` tools to help with this.
+`replace_ratelaw`, `stratify`, `replace_parameter_name`, `add_parameter`, `change_rate_law_and_add_parameter`, `remove_unused_parameters`, 
+`substitute_parameter` tools to help with this.
+
 
 Please generate the code as if you were programming inside a Jupyter Notebook and the code is to be executed inside a cell.
 You MUST wrap the code with a line containing three backticks (```) before and after the generated code.
