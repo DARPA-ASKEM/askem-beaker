@@ -1,0 +1,63 @@
+FROM python:3.10
+
+USER root
+
+# Install r-lang and kernel
+RUN apt update && \
+    apt install -y graphviz libgraphviz-dev \
+        libevent-core-2.1-7 libevent-pthreads-2.1-7 \
+        lsof && \
+    apt clean -y && \
+    apt autoclean -y \
+    apt autoremove -y
+
+RUN apt-get install -y build-essential make gcc g++ git gfortran npm \
+        gdal-bin libgdal-dev python3-all-dev libspatialindex-dev && \
+    npm install -g typescript
+ENV CPLUS_INCLUDE_PATH=/usr/include/gdal
+ENV C_INCLUDE_PATH=/usr/include/gdal
+
+# Switch to non-root user. It is crucial for security reasons to not run jupyter as root user!
+RUN useradd -m jupyter
+USER jupyter
+
+### Install Rust and Cargo
+##RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+##ENV PATH="/root/.cargo/bin:${PATH}"
+
+# Install MIRA from GitHub
+RUN git clone https://github.com/gyorilab/mira.git /home/jupyter/mira
+WORKDIR /home/jupyter/mira
+RUN git reset --hard 189a8f4847e0949f8dcb5ab47d29770732e1a363
+
+RUN pip install --no-cache-dir /home/jupyter/mira/"[ode,tests,dkg-client,dkg-construct,sbml,docs]" && \
+    rm -r /home/jupyter/mira
+
+# Install Gilda - Mira Dependency
+RUN pip install gilda==1.2.1
+
+# Install project requirements
+COPY --chown=1000:1000 pyproject.toml README.md hatch_build.py /home/jupyter/askem_beaker/
+RUN mkdir -p /home/jupyter/askem_beaker/src/askem_beaker && touch /home/jupyter/askem_beaker/src/askem_beaker/__init__.py
+RUN pip install --no-cache-dir --upgrade -e /home/jupyter/askem_beaker
+
+# Bootstrap MIRA runtime dependencies, these are lazily downloaded but we will get them ahead of time to avoid quirky
+# interfacing issues across jupyter messaging
+RUN python -c "from pyobo import Term, Reference, Obo"
+
+COPY --chown=1000:1000 . /home/jupyter/askem_beaker/
+
+# Installs the askem specific subkernels
+RUN pip install --no-cache-dir --upgrade /home/jupyter/askem_beaker
+
+#WORKDIR /askem_beaker
+WORKDIR /home/jupyter
+RUN unzip /home/jupyter/askem_beaker/resources/chromadb_functions_mira.zip \
+    && mv /home/jupyter/chromadb_functions /home/jupyter/chromadb_functions_mira && ls
+## RUN unzip /home/jupyter/askem_beaker/resources/chromadb_functions_chirho.zip \
+##     && mv /home/jupyter/chromadb_functions /home/jupyter/chromadb_functions_chirho && ls
+
+RUN mkdir /home/jupyter/workspace
+WORKDIR /home/jupyter/workspace
+
+CMD ["python", "-m", "beaker_kernel.server.main", "--ip", "0.0.0.0"]
