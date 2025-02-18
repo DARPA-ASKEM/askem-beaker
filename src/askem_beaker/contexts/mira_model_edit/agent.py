@@ -759,7 +759,7 @@ class MiraModelEditAgent(BaseAgent):
         )
 
     @tool()
-    async def remove_unsused_parameters(self, 
+    async def remove_unused_parameters(self, 
         agent: AgentRef, loop: LoopControllerRef
     ):
         """

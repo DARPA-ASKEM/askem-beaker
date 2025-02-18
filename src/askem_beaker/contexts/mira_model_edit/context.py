@@ -434,7 +434,7 @@ class MiraModelEditContext(BaseContext):
 		await self.send_mira_preview_message(parent_header=message.header)
 
 	@intercept()
-	async def remove_unsued_parameters_request(self, message):
+	async def remove_unused_parameters_request(self, message):
 		content = message.content
 
 		code = self.get_code("remove_unused_parameters", {})
