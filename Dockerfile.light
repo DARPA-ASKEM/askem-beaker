@@ -62,7 +62,7 @@ RUN pip install --no-cache-dir beaker-pysb
 # Install project requirements
 COPY --chown=1000:1000 pyproject.toml README.md hatch_build.py /home/jupyter/askem_beaker/
 RUN mkdir -p /home/jupyter/askem_beaker/src/askem_beaker && touch /home/jupyter/askem_beaker/src/askem_beaker/__init__.py
-RUN pip install --debug --no-cache-dir --upgrade -e /home/jupyter/askem_beaker
+RUN pip install --no-cache-dir --upgrade -e /home/jupyter/askem_beaker
 
 # Bootstrap MIRA runtime dependencies, these are lazily downloaded but we will get them ahead of time to avoid quirky
 # interfacing issues across jupyter messaging
@@ -71,7 +71,7 @@ RUN python -c "from pyobo import Term, Reference, Obo"
 COPY --chown=1000:1000 . /home/jupyter/askem_beaker/
 
 # Installs the askem specific subkernels
-RUN pip install --debug --no-cache-dir --upgrade /home/jupyter/askem_beaker
+RUN pip install --no-cache-dir --upgrade /home/jupyter/askem_beaker
 
 #WORKDIR /askem_beaker
 WORKDIR /home/jupyter
