@@ -8,10 +8,9 @@ import re
 import itertools
 
 from archytas.tool_utils import AgentRef, LoopControllerRef, tool, toolset
-from askem_beaker.contexts.mira.new_base_agent import NewBaseAgent
 
-from beaker_kernel.lib.agent import BaseAgent
-from beaker_kernel.lib.context import BaseContext
+from beaker_kernel.lib.agent import BeakerAgent
+from beaker_kernel.lib.context import BeakerContext
 
 logger = logging.getLogger(__name__)
 
@@ -79,7 +78,7 @@ class Toolset:
         # handle those cases by extracting the proper field
         if isinstance(model_vars, dict):
             model_vars = list(model_vars.get("model_vars", []))
-        
+
         # Generate all possible pairs of models to compare in the order that the plots
         # will be generated
         agent.context.comparison_pairs = [list(pair) for pair in itertools.combinations(model_vars, 2)]
@@ -226,7 +225,7 @@ class Toolset:
         return query_functions_classes(query)
 
 
-class Agent(NewBaseAgent):
+class Agent(BeakerAgent):
     """
     You are assisting us in performing important scientific tasks.
 
@@ -234,8 +233,8 @@ class Agent(NewBaseAgent):
     """
 
     MODEL = "gpt-4o"
-    
-    def __init__(self, context: BaseContext = None, tools: list = None, **kwargs):
+
+    def __init__(self, context: BeakerContext = None, tools: list = None, **kwargs):
         tools = [Toolset]
         super().__init__(context, tools, **kwargs)
         self.context_conf = json.loads(CONTEXT_JSON)
