@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Any, Dict, Optional
 import requests
 from requests.auth import HTTPBasicAuth
 
-from beaker_kernel.lib.context import BaseContext
+from beaker_kernel.lib.context import BeakerContext
 from beaker_kernel.lib.utils import intercept
 
 from .agent import MiraModelEditAgent
@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-class MiraModelEditContext(BaseContext):
+class MiraModelEditContext(BeakerContext):
 
 	agent_cls = MiraModelEditAgent
 
