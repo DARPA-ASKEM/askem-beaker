@@ -645,7 +645,7 @@ class MiraModelEditAgent(BaseAgent):
         concepts_to_preserve: Optional[list[str]] = None,
         params_to_stratify: Optional[list[str]] = None,
         params_to_preserve: Optional[list[str]] = None,
-		add_param_factor = Optional[bool] = True
+        add_param_factor = Optional[bool] = True
     ):
         """
         This tool is used when a user wants to stratify a model.
