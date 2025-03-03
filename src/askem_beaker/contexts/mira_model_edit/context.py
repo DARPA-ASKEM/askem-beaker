@@ -589,6 +589,7 @@ class MiraModelEditContext(BaseContext):
 		params_to_preserve = content.get("params_to_preserve")
 		cartesian_control = content.get("cartesian_control")
 		structure = content.get("structure")
+		add_param_factor = content.get("add_param_factor")
 
 		stratify_code = self.get_code("stratify", {
 			"key": key,
@@ -598,7 +599,8 @@ class MiraModelEditContext(BaseContext):
 			"params_to_stratify": params_to_stratify,
 			"params_to_preserve": params_to_preserve,
 			"cartesian_control": cartesian_control,
-			"structure": structure
+			"structure": structure,
+			"add_param_factor": add_param_factor
 		})
 		stratify_result = await self.execute(stratify_code)
 
