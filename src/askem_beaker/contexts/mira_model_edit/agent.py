@@ -637,7 +637,7 @@ class MiraModelEditAgent(BaseAgent):
         agent: AgentRef, loop: LoopControllerRef,
         key: str,
         strata: list[str],
-        structure: Optional[list[Tuple[str, str]]] = None,
+        structure: Optional[list[list[str]]] = None,
         directed: bool = False,
         cartesian_control: bool = False,
         modify_names: bool = True,
@@ -662,7 +662,7 @@ class MiraModelEditAgent(BaseAgent):
             strata (list):
                 These will be the individual groups used to stratify by. This should be converted to a list of strings for e.g., ``["boston", "nyc"]``
                 or ``["geonames:4930956", "geonames:5128581"]``.
-            structure (Optional[list[Tuple[str, str]]]):
+            structure (Optional[list[tuple[str, str]]]):
                 This describes how different strata within the same state are able to interact.
                 An iterable of pairs corresponding to a directed network structure
                 where each of the pairs has two strata. If none given, will assume a complete
