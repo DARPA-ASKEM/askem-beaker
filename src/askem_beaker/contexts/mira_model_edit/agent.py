@@ -644,7 +644,8 @@ class MiraModelEditAgent(BaseAgent):
         concepts_to_stratify: Optional[list[str]] = None,
         concepts_to_preserve: Optional[list[str]] = None,
         params_to_stratify: Optional[list[str]] = None,
-        params_to_preserve: Optional[list[str]] = None
+        params_to_preserve: Optional[list[str]] = None,
+        add_param_factor: Optional[bool] = True
     ):
         """
         This tool is used when a user wants to stratify a model.
@@ -715,6 +716,8 @@ class MiraModelEditAgent(BaseAgent):
                 This is a list of the parameters in the model that must not be stratified.
                 For example, given a model with parameters ("beta", "gamma") and a request like "preserve" or "do not stratify" the "beta" parameter, the value of this argument should be ["beta"].
                 If the request does not specify any parameter to not be stratified or preserved in particular, then the value of this argument should default to None.
+            add_param_factor (Optional):
+                Whether to add new proxy-parameters when stratification involve parameters. For example instead of "beta_young" and "beta_old", it will be "beta * f_young" and "beta * f_old"
         """
 
         code = agent.context.get_code("stratify", {
@@ -727,7 +730,8 @@ class MiraModelEditAgent(BaseAgent):
             "concepts_to_stratify": concepts_to_stratify,
             "concepts_to_preserve": concepts_to_preserve,
             "params_to_stratify": params_to_stratify,
-            "params_to_preserve": params_to_preserve
+            "params_to_preserve": params_to_preserve,
+            "add_param_factor": add_param_factor
         })
         loop.set_state(loop.STOP_SUCCESS)
         return json.dumps(
