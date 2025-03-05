@@ -49,3 +49,8 @@ model = stratify(
     params_to_preserve= {{ params_to_preserve|default(None) }}, #If none given, will stratify all parameters.
     param_renaming_uses_strata_names = True
 )
+
+# Remove any leftover parameter
+for __, factor in new_params.items():
+    if factor in model.parameters.keys():
+        __ = model.parameters.pop(factor)
