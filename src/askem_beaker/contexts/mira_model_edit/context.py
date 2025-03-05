@@ -590,6 +590,8 @@ class MiraModelEditContext(BaseContext):
 		cartesian_control = content.get("cartesian_control")
 		structure = content.get("structure")
 		add_param_factor = content.get("add_param_factor")
+		if add_param_factor is None:
+			add_param_factor = True
 
 		stratify_code = self.get_code("stratify", {
 			"key": key,
