@@ -23,7 +23,7 @@ classifiers = [
 ]
 dependencies = [
   "beaker-kernel==1.9.1",
-  "archytas==1.3.12",
+  "archytas==1.3.13",
   "pandas",
   "matplotlib",
   "xarray",

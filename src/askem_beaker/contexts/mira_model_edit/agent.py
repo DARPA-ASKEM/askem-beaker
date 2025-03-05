@@ -637,7 +637,7 @@ class MiraModelEditAgent(BaseAgent):
         agent: AgentRef, loop: LoopControllerRef,
         key: str,
         strata: list[str],
-        structure: Optional[list[Tuple[str, str]]] = None,
+        structure: Optional[list[list[str]]] = None,
         directed: bool = False,
         cartesian_control: bool = False,
         modify_names: bool = True,
@@ -663,7 +663,7 @@ class MiraModelEditAgent(BaseAgent):
             strata (list):
                 These will be the individual groups used to stratify by. This should be converted to a list of strings for e.g., ``["boston", "nyc"]``
                 or ``["geonames:4930956", "geonames:5128581"]``.
-            structure (Optional):
+            structure (Optional[list[tuple[str, str]]]):
                 This describes how different strata within the same state are able to interact.
                 An iterable of pairs corresponding to a directed network structure
                 where each of the pairs has two strata. If none given, will assume a complete
@@ -704,15 +704,15 @@ class MiraModelEditAgent(BaseAgent):
                 This is a list of the state variables in the model that is required to be stratified.
                 For example, given a model with state variables ("S", "E", "I", "R") and a request to only stratify the "S" state variable, the value of this argument should be ["S"].
                 If the request does not specify any state variable to stratify in particular, then the value of this argument should default to None.
-            concepts_to_preserve (Optional):
+            concepts_to_preserve (Optional[list[str]]):
                 This is a list of the state variables in the model that must not be stratified.
                 For example, given a model with state variables ("S", "E", "I", "R") and a request like "preserve" or "do not stratify" the "S" state variable, the value of this argument should be ["S"].
                 If the request does not specify any state variable to not be stratified or preserved in particular, then the value of this argument should default to None.
-            params_to_stratify (Optional):
+            params_to_stratify (Optional[list[str]]):
                 This is a list of the parameters in the model that is required to be stratified.
                 For example, given a model with parameters ("beta", "gamma") and a request to only stratify the "beta" parameter, the value of this argument should be ["beta"].
                 If the request does not specify any parameter to stratify in particular, then the value of this argument should default to None.
-            params_to_preserve (Optional):
+            params_to_preserve (Optional[list[str]]):
                 This is a list of the parameters in the model that must not be stratified.
                 For example, given a model with parameters ("beta", "gamma") and a request like "preserve" or "do not stratify" the "beta" parameter, the value of this argument should be ["beta"].
                 If the request does not specify any parameter to not be stratified or preserved in particular, then the value of this argument should default to None.
