@@ -94,7 +94,7 @@ class MiraModelEditContext(BaseContext):
 			raise
 
 	@intercept()
-	async def reset_request(self, message):
+	async def reset_mira_request(self, message):
 		content = message.content
 
 		model_name = content.get("model_name", "model")
@@ -109,7 +109,7 @@ class MiraModelEditContext(BaseContext):
 		}
 
 		self.beaker_kernel.send_response(
-				"iopub", "reset_response", content, parent_header=message.header
+				"iopub", "reset_mira_response", content, parent_header=message.header
 		)
 		await self.send_mira_preview_message(parent_header=message.header)
 
@@ -158,6 +158,29 @@ class MiraModelEditContext(BaseContext):
 			"iopub", "replace_state_name_response", content, parent_header=message.header
 		)
 		await self.send_mira_preview_message(parent_header=message.header)
+
+	@intercept()
+	async def replace_parameter_name_request(self, message):
+		content = message.content
+
+		old_name = content.get("old_name")
+		new_name = content.get("new_name")
+
+		code = self.get_code("replace_parameter_name", {
+			"old_name": old_name,
+			"new_name": new_name
+		})
+		result = await self.execute(code)
+		content = {
+			"success": True,
+			"executed_code": result["parent"].content["code"],
+		}
+
+		self.beaker_kernel.send_response(
+			"iopub", "replace_parameter_name_response", content, parent_header=message.header
+		)
+		await self.send_mira_preview_message(parent_header=message.header)
+
 
 	@intercept()
 	async def add_natural_conversion_template_request(self, message):
@@ -466,29 +489,6 @@ class MiraModelEditContext(BaseContext):
 
 		self.beaker_kernel.send_response(
 			"iopub", "substitute_parameter_response", content, parent_header=message.header
-		)
-		await self.send_mira_preview_message(parent_header=message.header)
-
-
-	@intercept()
-	async def update_parameter_request(self, message):
-		content = message.content
-
-		updated_id = content.get("updated_id")
-		replacement_value = content.get("replacement_value")
-
-		code = self.get_code("update_parameter", {
-			"updated_id": updated_id,
-			"replacement_value": replacement_value
-		})
-		result = await self.execute(code)
-		content = {
-			"success": True,
-			"executed_code": result["parent"].content["code"],
-		}
-
-		self.beaker_kernel.send_response(
-			"iopub", "update_parameter_response", content, parent_header=message.header
 		)
 		await self.send_mira_preview_message(parent_header=message.header)
 

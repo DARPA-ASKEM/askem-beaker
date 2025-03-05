@@ -9,7 +9,7 @@ from archytas.tool_utils import AgentRef, LoopControllerRef, tool
 from beaker_kernel.lib.agent import BaseAgent
 from beaker_kernel.lib.context import BaseContext
 from beaker_kernel.lib.jupyter_kernel_proxy import JupyterMessage
-from typing import Collection, Iterable, Optional, Tuple
+from typing import Optional, Tuple
 
 logging.disable(logging.WARNING)  # Disable warnings
 logger = logging.Logger(__name__)
@@ -49,7 +49,7 @@ class MiraModelEditAgent(BaseAgent):
         code = agent.context.get_code("inspect_template_model", {"model_name": "model"})
         response = await agent.context.evaluate(code)
         return response["return"]
-    
+
     @tool()
     async def replace_template_name(self, old_name: str, new_name: str, agent: AgentRef, loop: LoopControllerRef):
         """
@@ -108,6 +108,25 @@ class MiraModelEditAgent(BaseAgent):
         )
 
     @tool()
+    async def replace_parameter_name(self, old_name: str, new_name: str, agent: AgentRef, loop: LoopControllerRef):
+        """
+        This tool is used when a user wants to rename a parameter from an old name to a new name in every expression of the model that it is used.
+
+        Args:
+            old_name (str): The old/existing name of the parameter as it exists in the model before changing.
+            new_name (str): The name to which the parameter should be renamed.
+        """
+        code = agent.context.get_code("replace_parameter_name", {"old_name": old_name, "new_name": new_name})
+        loop.set_state(loop.STOP_SUCCESS)
+        return json.dumps(
+            {
+                "action": "code_cell",
+                "language": "python3",
+                "content": code.strip(),
+            }
+        )
+
+    @tool()
     async def add_observable(self, new_id: str, new_name: str, new_expression: str, agent: AgentRef, loop: LoopControllerRef):
         """
         This tool is used when a user wants to add an observable.
@@ -130,22 +149,22 @@ class MiraModelEditAgent(BaseAgent):
                 "content": code.strip(),
             }
         )
-    
+
     @tool()
-    async def add_observable_pattern(self, new_name: str, 
-                                     identifier_keys: list[str], 
+    async def add_observable_pattern(self, new_name: str,
+                                     identifier_keys: list[str],
                                      identifier_values: list[str],
                                      context_keys: list[str],
                                      context_values: list[str],
-                                     agent: AgentRef, 
+                                     agent: AgentRef,
                                      loop: LoopControllerRef):
         """
         This tool is used when a user wants to add an observable via a complex pattern. You should inspect the model BEFORE using this tool
         so that you can properly map the users request to the correct identifiers and contexts in the model. Typically the identifier key
         will be something like "ido" and the identifier value will be something like "0000514". Context keys will be the name of the strata context (e.g. "Age")
-        and the values will be the value for that strata context (e.g. "youth"). 
+        and the values will be the value for that strata context (e.g. "youth").
 
-        When the user specifies a high level state (such as Infected) this would be specified via the identifiers; when the user specifies 
+        When the user specifies a high level state (such as Infected) this would be specified via the identifiers; when the user specifies
         a strata (such as "youth") that is specified via the context.
 
         Args:
@@ -157,7 +176,7 @@ class MiraModelEditAgent(BaseAgent):
         """
         identifier_dict = dict(zip(identifier_keys, identifier_values))
         context_dict = dict(zip(context_keys, context_values))
-        code = agent.context.get_code("add_observable_pattern", 
+        code = agent.context.get_code("add_observable_pattern",
                                       {"new_name": new_name,
                                        "identifier_keys": identifier_keys,
                                        "identifier_values": identifier_values,
@@ -173,7 +192,7 @@ class MiraModelEditAgent(BaseAgent):
                 "language": "python3",
                 "content": code.strip(),
             }
-        )    
+        )
 
     @tool()
     async def remove_observable(self, remove_id: str, agent: AgentRef, loop: LoopControllerRef):
@@ -334,7 +353,7 @@ class MiraModelEditAgent(BaseAgent):
           - there is only an outcome
           - there are no subject or controller(s)
           - the outcome is the state variable representing a population that grows at some constant rate
-        
+
         An example of a natural-production transition is the natural birth of a population of humans susceptible to an infectious disease:
           - the user request could be "add a natural birth process for the state 'Susceptible_humans' at a rate of 'b'"
           - outcome_name = "Susceptible_humans"
@@ -392,7 +411,7 @@ class MiraModelEditAgent(BaseAgent):
         agent: AgentRef, loop: LoopControllerRef):
         """
         This tool is used when a user wants to add a controlled production to the model.
-        A controlled production is a template that contains two concepts or state variables: 
+        A controlled production is a template that contains two concepts or state variables:
           - the outcome represents a population that grows due to this transition
           - the controller represents a second population upon which the growth rate depends
 
@@ -464,7 +483,7 @@ class MiraModelEditAgent(BaseAgent):
           - there are no outcome or controller(s)
           - the subject is the state variable representing a population that decays or dies at some rate proportional to the population itself
           - the parameter is the degradation or decay rate
-        
+
         An example of a natural-degradation transition is the natural death of a population of living organisms:
           - the user request could be "add a natural death process for the state 'Recovered_humans' at a rate of 'c'"
           - subject_name = "Recovered_humans"
@@ -475,7 +494,7 @@ class MiraModelEditAgent(BaseAgent):
 
         Other examples of natural degradation are radioactive decay of atomic nuclei and any other processes that can be modelled as an exponential decay.
 
-        If the user provides a "lifetime" instead of a decay rate, then the parameter of the natural-degradation transition is this "lifetime" and the template_expression is "(1 / lifetime) * subject_name".        
+        If the user provides a "lifetime" instead of a decay rate, then the parameter of the natural-degradation transition is this "lifetime" and the template_expression is "(1 / lifetime) * subject_name".
         If the user provides a "half-life", then the parameter is this "halflife" and the template_expression is "0.301 / halflife * subject_name".
 
         Always make sure that template_expression is the string representation of a mathematical expression that can be parsed by SymPy.
@@ -544,7 +563,7 @@ class MiraModelEditAgent(BaseAgent):
         Always make sure that template_expression is the string representation of a mathematical expression that can be parsed by SymPy.
         If the user provides a math expression containing the operator "^", replace it with "**".
         If the user provides an equation, pick the right hand side expression
-        
+
         Args:
             subject_name (str): the state name that is the new transition's outputs. This is the state population moves to.
             subject_initial_value (float): The number associated with the output state at its first step in time. If not known or not specified the default value of `1` should be used.
@@ -587,7 +606,7 @@ class MiraModelEditAgent(BaseAgent):
     ):
         """
         This tool is used when a user wants to replace a rate law.
-        
+
         An example of this would be "change the rate law of the 'infection' template to 'S * I * beta / N'"
           - template_name = "infection"
           - new_rate_law = "S * I * beta / N"
@@ -595,7 +614,7 @@ class MiraModelEditAgent(BaseAgent):
         Always make sure that new_rate_law is the string representation of a mathematical expression that can be parsed by SymPy.
         If the user provides a math expression containing the operator "^", replace it with "**".
         If the user provides an equation, pick the right hand side expression
-        
+
         Args:
             template_name (str): This is the name of the template that has the rate law.
             new_rate_law (str): This is the mathematical expression used to determine the rate law.
@@ -617,15 +636,15 @@ class MiraModelEditAgent(BaseAgent):
     async def stratify(self,
         agent: AgentRef, loop: LoopControllerRef,
         key: str,
-        strata: Collection[str],
-        structure: Optional[Iterable[Tuple[str, str]]] = None,
+        strata: list[str],
+        structure: Optional[list[list[str]]] = None,
         directed: bool = False,
         cartesian_control: bool = False,
         modify_names: bool = True,
-        concepts_to_stratify: Optional[Collection[str]] = None,
-        concepts_to_preserve: Optional[Collection[str]] = None,
-        params_to_stratify: Optional[Collection[str]] = None,
-        params_to_preserve: Optional[Collection[str]] = None
+        concepts_to_stratify: Optional[list[str]] = None,
+        concepts_to_preserve: Optional[list[str]] = None,
+        params_to_stratify: Optional[list[str]] = None,
+        params_to_preserve: Optional[list[str]] = None
     ):
         """
         This tool is used when a user wants to stratify a model.
@@ -640,10 +659,10 @@ class MiraModelEditAgent(BaseAgent):
             key (str):
                 The (singular) name which describe the stratification. Some examples include, ``"City"``, ``"Age"``, ``"Vacination_Status"``, and ``"Location"``
                 If a key cannot be explicitly grabbed from try your best to categorize the strata
-            strata (Collection):
+            strata (list):
                 These will be the individual groups used to stratify by. This should be converted to a list of strings for e.g., ``["boston", "nyc"]``
                 or ``["geonames:4930956", "geonames:5128581"]``.
-            structure (Optional):
+            structure (Optional[list[tuple[str, str]]]):
                 This describes how different strata within the same state are able to interact.
                 An iterable of pairs corresponding to a directed network structure
                 where each of the pairs has two strata. If none given, will assume a complete
@@ -680,19 +699,19 @@ class MiraModelEditAgent(BaseAgent):
                 (e.g., ``"S"`` becomes ``"S_boston"``). If false, will keep the original
                 names.
                 If this cannot be found it should default to True
-            concepts_to_stratify (Optional): 
+            concepts_to_stratify (Optional[list[str]]):
                 This is a list of the state variables in the model that is required to be stratified.
                 For example, given a model with state variables ("S", "E", "I", "R") and a request to only stratify the "S" state variable, the value of this argument should be ["S"].
                 If the request does not specify any state variable to stratify in particular, then the value of this argument should default to None.
-            concepts_to_preserve (Optional): 
+            concepts_to_preserve (Optional[list[str]]):
                 This is a list of the state variables in the model that must not be stratified.
                 For example, given a model with state variables ("S", "E", "I", "R") and a request like "preserve" or "do not stratify" the "S" state variable, the value of this argument should be ["S"].
                 If the request does not specify any state variable to not be stratified or preserved in particular, then the value of this argument should default to None.
-            params_to_stratify (Optional):
+            params_to_stratify (Optional[list[str]]):
                 This is a list of the parameters in the model that is required to be stratified.
                 For example, given a model with parameters ("beta", "gamma") and a request to only stratify the "beta" parameter, the value of this argument should be ["beta"].
                 If the request does not specify any parameter to stratify in particular, then the value of this argument should default to None.
-            params_to_preserve (Optional):
+            params_to_preserve (Optional[list[str]]):
                 This is a list of the parameters in the model that must not be stratified.
                 For example, given a model with parameters ("beta", "gamma") and a request like "preserve" or "do not stratify" the "beta" parameter, the value of this argument should be ["beta"].
                 If the request does not specify any parameter to not be stratified or preserved in particular, then the value of this argument should default to None.
@@ -759,7 +778,7 @@ class MiraModelEditAgent(BaseAgent):
         )
 
     @tool()
-    async def remove_unused_parameters(self, 
+    async def remove_unused_parameters(self,
         agent: AgentRef, loop: LoopControllerRef
     ):
         """
@@ -776,19 +795,19 @@ class MiraModelEditAgent(BaseAgent):
                 "content": code.strip(),
             }
         )
-    
+
     @tool()
-    async def substitute_parameter(self, 
+    async def substitute_parameter(self,
         parameter_name: str,
-        agent: AgentRef, 
+        agent: AgentRef,
         loop: LoopControllerRef
     ):
         """
         This tool is used when a user wants to remove a specified parameter from their model.
-        An example for this might look like: "Remove the parameter beta"
+        An example for this might look like: "Remove the parameter beta" or "Substitute the parameter beta with 1"
 
         Args:
-            parameter_name (str): This is the name of the parameter the user wants to remove. 
+            parameter_name (str): This is the name of the parameter the user wants to remove.
         """
 
         code = agent.context.get_code("substitute_parameter", {
@@ -817,7 +836,7 @@ class MiraModelEditAgent(BaseAgent):
         units_mathml: str
     ):
         """
-        This tool is used when a user wants to replace a ratelaw and add a parameter to a model.
+        This tool is used when a user wants to replace a rate law and add a parameter to a model.
 
         If the parameter is specified as a distribution, the distribution arg should be a dictionary
         object that looks like
@@ -908,7 +927,7 @@ class MiraModelEditAgent(BaseAgent):
           - it does have a list of controllers
 
         An example of a grouped controlled degradation transition is predation or the decrease of a prey population caused by a predator population
-          - the user request could be "add a death process to the 'Rabbit' caused by 'Wolf', and 'Owl' 
+          - the user request could be "add a death process to the 'Rabbit' caused by 'Wolf', and 'Owl'
           - template_name = "Death of Rabbits caused by Wolf"
           - template_expression = "beta * (Rabbit + Wolf + Owl)"
           - subject_name = "Rabbit"
@@ -919,7 +938,7 @@ class MiraModelEditAgent(BaseAgent):
         Always make sure that template_expression is the string representation of a mathematical expression that can be parsed by SymPy.
         If the user provides a math expression containing the operator "^", replace it with "**".
         If the user provides an equation, pick the right hand side expression
-        
+
         Args:
             subject_name (str): the state names that is the new transition's outputs. This is the state population moves to.
             subject_initial_value (float): The number associated with the output state at its first step in time. If not known or not specified the default value of `1` should be used.
@@ -1028,7 +1047,7 @@ class MiraModelEditAgent(BaseAgent):
         agent: AgentRef, loop: LoopControllerRef):
         """
         This tool is used when a user wants to add a group controlled production to the model.
-        A group controlled production is a template that contains two concepts or state variables: 
+        A group controlled production is a template that contains two concepts or state variables:
           - the outcome represents a population that grows due to this transition
           - the controller represents a group of populations upon which the growth rate depends
 
@@ -1076,7 +1095,7 @@ class MiraModelEditAgent(BaseAgent):
             }
         )
 
- 
+
 
     @tool()
     async def generate_code(
@@ -1102,10 +1121,12 @@ Please write code that satisfies the user's request.
 You have access to a model `model` that is a Mira Template Model. You can use the `inspect_template_model` tool to better understand it
 and its structure.
 
-If you are asked to edit the model, you should try to use other tools for it. You can use the `replace_template_name`, `remove_template`, 
-`replace_state_name`, `add_observable`, `remove_observable`, `add_natural_conversion_template`, `add_controlled_conversion_template`, 
-`add_natural_production_template`, `add_controlled_production_template`, `add_natural_degradation_template`, `add_controlled_degradation_template`, 
-`replace_ratelaw`, `stratify`, `add_parameter`, `change_rate_law_and_add_parameter` tools to help with this.
+If you are asked to edit the model, you should try to use other tools for it. You can use the `replace_template_name`, `remove_template`,
+`replace_state_name`, `add_observable`, `remove_observable`, `add_natural_conversion_template`, `add_controlled_conversion_template`,
+`add_natural_production_template`, `add_controlled_production_template`, `add_natural_degradation_template`, `add_controlled_degradation_template`,
+`replace_ratelaw`, `stratify`, `replace_parameter_name`, `add_parameter`, `change_rate_law_and_add_parameter`, `remove_unused_parameters`,
+`substitute_parameter` tools to help with this.
+
 
 Please generate the code as if you were programming inside a Jupyter Notebook and the code is to be executed inside a cell.
 You MUST wrap the code with a line containing three backticks (```) before and after the generated code.

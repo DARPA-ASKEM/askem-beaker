@@ -58,7 +58,11 @@ class DatasetContext(BaseContext):
             asset_info_req = requests.get(meta_url, auth=self.auth.requests_auth())
             if asset_info_req.status_code == 404:
                 raise Exception(f"Dataset '{asset_id}' not found.")
-            asset_info = asset_info_req.json()
+            try:
+                asset_info = asset_info_req.json()
+            except Exception as e:
+                logger.error(f"Error parsing dataset info for {asset_id}: {e}")
+                raise Exception(f"Failed to load dataset '{asset_id}': {asset_info_req.status_code} {asset_info_req.text}")
             if asset_info:
                 self.asset_map[var_name]["info"] = asset_info
             else:
