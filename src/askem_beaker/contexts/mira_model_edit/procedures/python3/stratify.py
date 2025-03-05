@@ -6,7 +6,7 @@ params_to_stratify= {{ params_to_stratify|default(None) }}
 model_to_stratify = copy.deepcopy(model)
 
 if add_param_factor == True:
-    new_params = {param: 'f_' + param for param in params_to_stratify}
+    new_params = {param: 'f' + param for param in params_to_stratify}
     for param, factor in new_params.items():
         # In case of parameter name clash
         while factor in model_to_stratify.parameters.keys():
@@ -49,3 +49,8 @@ model = stratify(
     params_to_preserve= {{ params_to_preserve|default(None) }}, #If none given, will stratify all parameters.
     param_renaming_uses_strata_names = True
 )
+
+# Remove any leftover parameter
+for __, factor in new_params.items():
+    if factor in model.parameters.keys():
+        __ = model.parameters.pop(factor)
