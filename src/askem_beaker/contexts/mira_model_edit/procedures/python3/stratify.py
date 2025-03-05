@@ -15,14 +15,14 @@ model = stratify(
     param_renaming_uses_strata_names = True
 )
 
-add_param_factor = {{ add_param_factor | True }}
+add_param_factor = {{ add_param_factor|default(True) }}
 
 # FIXME: need to juggle inclusive vs exclusive
 params_to_stratify= {{ params_to_stratify|default(None) }}
 
 model_ = copy.deepcopy(model)
 
-if add_param_factor:
+if add_param_factor == True:
     new_params = {param: 'f_' + param for param in params_to_stratify}
     for param, factor in new_params.items():
 
