@@ -4,6 +4,7 @@ add_param_factor = {{ add_param_factor|default(True) }}
 params_to_stratify= {{ params_to_stratify|default(None) }}
 
 model_to_stratify = copy.deepcopy(model)
+new_params = {}
 
 if add_param_factor == True:
     new_params = {param: 'f' + param for param in params_to_stratify}
