@@ -119,9 +119,7 @@ workflows:
               platform: [ amd64, arm64 ]
           filters:
             branches:
-              only:
-                - main
-                - server-mode
+              only: main
             tags:
               only: /.*/
       - create-manifest:
@@ -129,8 +127,6 @@ workflows:
             - build-push-light
           filters:
             branches:
-              only:
-                - main
-                - server-mode
+              only: main
             tags:
               only: /.*/
