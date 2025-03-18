@@ -12,7 +12,6 @@ on:
       - 'src/**'
     branches:
       - 'main'
-      - 'server-mode'
     tags:
       - '*'
 
