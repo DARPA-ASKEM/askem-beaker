@@ -108,25 +108,6 @@ class MiraModelEditAgent(BaseAgent):
         )
 
     @tool()
-    async def replace_parameter_name(self, old_name: str, new_name: str, agent: AgentRef, loop: LoopControllerRef):
-        """
-        This tool is used when a user wants to rename a parameter from an old name to a new name in every expression of the model that it is used.
-
-        Args:
-            old_name (str): The old/existing name of the parameter as it exists in the model before changing.
-            new_name (str): The name to which the parameter should be renamed.
-        """
-        code = agent.context.get_code("replace_parameter_name", {"old_name": old_name, "new_name": new_name})
-        loop.set_state(loop.STOP_SUCCESS)
-        return json.dumps(
-            {
-                "action": "code_cell",
-                "language": "python3",
-                "content": code.strip(),
-            }
-        )
-
-    @tool()
     async def add_observable(self, new_id: str, new_name: str, new_expression: str, agent: AgentRef, loop: LoopControllerRef):
         """
         This tool is used when a user wants to add an observable.
@@ -802,20 +783,24 @@ class MiraModelEditAgent(BaseAgent):
 
     @tool()
     async def substitute_parameter(self,
-        parameter_name: str,
+        old_name: str,
+        new_name: str,
         agent: AgentRef,
         loop: LoopControllerRef
     ):
         """
-        This tool is used when a user wants to remove a specified parameter from their model.
-        An example for this might look like: "Remove the parameter beta" or "Substitute the parameter beta with 1"
+        This tool is used when a user wants replace a specified parameter from their model or to remove a specified parameter from their model.
+        An example for this might look like: "Substitute parameter Beta with Beta * X". Where old_name is "Beta" and new name is "Beta * X"
+        another example might look like: "Remove the parameter beta" or "Substitute the parameter beta with 1". Where old name is "beta" and new name is "1"
 
         Args:
-            parameter_name (str): This is the name of the parameter the user wants to remove.
+            old_name (str): This is the name of the parameter the user wants to remove.
+            new_name (str): This is an optional new name of the parameter. If this is not provided the user will be looking to remove the parameter.
         """
 
         code = agent.context.get_code("substitute_parameter", {
-            "parameter_name": parameter_name
+            "old_name": old_name,
+            "new_name": new_name
         })
 
         loop.set_state(loop.STOP_SUCCESS)
@@ -1128,7 +1113,7 @@ and its structure.
 If you are asked to edit the model, you should try to use other tools for it. You can use the `replace_template_name`, `remove_template`,
 `replace_state_name`, `add_observable`, `remove_observable`, `add_natural_conversion_template`, `add_controlled_conversion_template`,
 `add_natural_production_template`, `add_controlled_production_template`, `add_natural_degradation_template`, `add_controlled_degradation_template`,
-`replace_ratelaw`, `stratify`, `replace_parameter_name`, `add_parameter`, `change_rate_law_and_add_parameter`, `remove_unused_parameters`,
+`replace_ratelaw`, `stratify`, `add_parameter`, `change_rate_law_and_add_parameter`, `remove_unused_parameters`,
 `substitute_parameter` tools to help with this.
 
 
