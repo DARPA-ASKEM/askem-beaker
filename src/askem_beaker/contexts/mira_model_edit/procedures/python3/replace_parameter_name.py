@@ -27,9 +27,7 @@ def replace_parameter_id(model: TemplateModel, old_id: str, new_id: str) -> Temp
     
     for template in tm.templates:
         if template.rate_law:
-            template.rate_law = SympyExprStr(
-                template.rate_law.args[0].subs(sympy.Symbol(old_id),
-                                               sympy.Symbol(new_id)))
+            template.substitute_parameter(old_id, sympy.Symbol(new_id))
             
     for observable in tm.observables.values():
         observable.expression = SympyExprStr(
