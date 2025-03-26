@@ -8,7 +8,7 @@ has_toc: true
 
 # mira
 
-This context is used for new development around [Mira](https://github.com/gyorilab/mira) with a specific focus on trying to generate new behavior with an LLM assistant based on Mira's documentation and examples. On setup, the context expects an object with a single key `models`, a list of objects containing `name` and `model_id`.:
+This context is used for new development around [Mira](https://github.com/DARPA-ASKEM/mira) with a specific focus on trying to generate new behavior with an LLM assistant based on Mira's documentation and examples. On setup, the context expects an object with a single key `models`, a list of objects containing `name` and `model_id`.:
 
 ```
 {
