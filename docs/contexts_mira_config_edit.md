@@ -8,7 +8,7 @@ has_toc: true
 
 # mira_config_edit
 
-This context is used for editing model configurations via [Mira](https://github.com/gyorilab/mira). It accesses the `model` aspect of a configuration and loads it as a Mira Template Model for editing. On setup it expects a model configuration `id` to be provided; unlike other contexts the key is always `id` and the value is the model configuration `id`. For example:
+This context is used for editing model configurations via [Mira](https://github.com/DARPA-ASKEM/mira). It accesses the `model` aspect of a configuration and loads it as a Mira Template Model for editing. On setup it expects a model configuration `id` to be provided; unlike other contexts the key is always `id` and the value is the model configuration `id`. For example:
 
 ```
 {

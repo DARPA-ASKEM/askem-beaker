@@ -8,7 +8,7 @@ has_toc: true
 
 # mira_model_edit
 
-This context is used for editing models via [Mira](https://github.com/gyorilab/mira) with a specific focus on fine-grained state and transition manipulation. This context was created by Uncharted. On setup it expects a model `id` to be provided; unlike other contexts the key is always `id` and the value is the model `id`. For example:
+This context is used for editing models via [Mira](https://github.com/DARPA-ASKEM/mira) with a specific focus on fine-grained state and transition manipulation. This context was created by Uncharted. On setup it expects a model `id` to be provided; unlike other contexts the key is always `id` and the value is the model `id`. For example:
 
 ```
 {
