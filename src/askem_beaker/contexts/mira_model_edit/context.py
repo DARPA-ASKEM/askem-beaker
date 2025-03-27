@@ -94,7 +94,7 @@ class MiraModelEditContext(BaseContext):
 			raise
 
 	@intercept()
-	async def reset_request(self, message):
+	async def reset_mira_request(self, message):
 		content = message.content
 
 		model_name = content.get("model_name", "model")
@@ -109,7 +109,7 @@ class MiraModelEditContext(BaseContext):
 		}
 
 		self.beaker_kernel.send_response(
-				"iopub", "reset_response", content, parent_header=message.header
+				"iopub", "reset_mira_response", content, parent_header=message.header
 		)
 		await self.send_mira_preview_message(parent_header=message.header)
 
@@ -589,6 +589,9 @@ class MiraModelEditContext(BaseContext):
 		params_to_preserve = content.get("params_to_preserve")
 		cartesian_control = content.get("cartesian_control")
 		structure = content.get("structure")
+		add_param_factor = content.get("add_param_factor")
+		if add_param_factor is None:
+			add_param_factor = True
 
 		stratify_code = self.get_code("stratify", {
 			"key": key,
@@ -598,7 +601,8 @@ class MiraModelEditContext(BaseContext):
 			"params_to_stratify": params_to_stratify,
 			"params_to_preserve": params_to_preserve,
 			"cartesian_control": cartesian_control,
-			"structure": structure
+			"structure": structure,
+			"add_param_factor": add_param_factor
 		})
 		stratify_result = await self.execute(stratify_code)
 

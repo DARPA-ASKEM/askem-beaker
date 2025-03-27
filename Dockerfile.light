@@ -1,7 +1,21 @@
 FROM python:3.10
 
-USER root
+# Set default server env variables
+ENV BEAKER_AGENT_USER=jupyter
+ENV BEAKER_SUBKERNEL_USER=user
+ENV BEAKER_RUN_PATH=/var/run/beaker
 
+USER root
+RUN useradd -m jupyter
+RUN useradd -m user
+RUN groupadd beaker
+RUN usermod -a -G beaker ${BEAKER_AGENT_USER}
+RUN usermod -a -G beaker ${BEAKER_SUBKERNEL_USER}
+
+RUN mkdir -m 775 ${BEAKER_RUN_PATH}
+RUN chown -R root:beaker ${BEAKER_RUN_PATH}
+RUN mkdir -m 775 ${BEAKER_RUN_PATH}/checkpoints
+RUN chown -R jupyter ${BEAKER_RUN_PATH}/checkpoints
 
 # Install r-lang and kernel
 RUN apt update && \
@@ -19,10 +33,6 @@ RUN apt-get install -y build-essential make gcc g++ git gfortran npm \
 ENV CPLUS_INCLUDE_PATH=/usr/include/gdal
 ENV C_INCLUDE_PATH=/usr/include/gdal
 
-# Switch to non-root user. It is crucial for security reasons to not run jupyter as root user!
-RUN useradd -m jupyter
-USER jupyter
-
 # Install Rust and Cargo
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 ENV PATH="/root/.cargo/bin:${PATH}"
@@ -31,7 +41,7 @@ ENV PATH="/root/.cargo/bin:${PATH}"
 RUN pip install --no-cache-dir git+https://github.com/ciemss/pyciemss.git@adeb6b974746f86b20597e3d037041121e8ac9c9 --use-pep517
 
 # Install MIRA from GitHub
-RUN git clone https://github.com/gyorilab/mira.git /home/jupyter/mira
+RUN git clone https://github.com/DARPA-ASKEM/mira.git /home/jupyter/mira
 WORKDIR /home/jupyter/mira
 RUN git reset --hard 189a8f4847e0949f8dcb5ab47d29770732e1a363
 
@@ -43,7 +53,6 @@ RUN pip install gilda==1.2.1
 
 #### START Installs for PySB context
 # Install project requirements
-USER root
 WORKDIR /tmp
 RUN wget https://github.com/RuleWorld/bionetgen/releases/download/BioNetGen-2.9.2/BioNetGen-2.9.2-linux.tar.gz && \
     tar -xzf BioNetGen-2.9.2-linux.tar.gz && \
@@ -54,7 +63,6 @@ WORKDIR /opt/stochkit
 ENV STOCHKIT_HOME=/opt/stochkit
 RUN git clone https://github.com/StochSS/StochKit.git /opt/stochkit
 RUN bash ./install.sh
-USER jupyter
 ENV PATH=$PATH:$STOCHKIT_HOME/bin
 RUN pip install --no-cache-dir beaker-pysb
 ####  END  Installs for PySB context
@@ -63,6 +71,11 @@ RUN pip install --no-cache-dir beaker-pysb
 COPY --chown=1000:1000 pyproject.toml README.md hatch_build.py /home/jupyter/askem_beaker/
 RUN mkdir -p /home/jupyter/askem_beaker/src/askem_beaker && touch /home/jupyter/askem_beaker/src/askem_beaker/__init__.py
 RUN pip install --no-cache-dir --upgrade -e /home/jupyter/askem_beaker
+
+# uninstall pyobo
+RUN pip uninstall pyobo -y
+# Install pyobo from Github (https://github.com/biopragmatics/pyobo)
+RUN pip install git+https://github.com/biopragmatics/pyobo.git
 
 # Bootstrap MIRA runtime dependencies, these are lazily downloaded but we will get them ahead of time to avoid quirky
 # interfacing issues across jupyter messaging
@@ -73,14 +86,12 @@ COPY --chown=1000:1000 . /home/jupyter/askem_beaker/
 # Installs the askem specific subkernels
 RUN pip install --no-cache-dir --upgrade /home/jupyter/askem_beaker
 
-#WORKDIR /askem_beaker
 WORKDIR /home/jupyter
 RUN unzip /home/jupyter/askem_beaker/resources/chromadb_functions_mira.zip \
     && mv /home/jupyter/chromadb_functions /home/jupyter/chromadb_functions_mira && ls
 RUN unzip /home/jupyter/askem_beaker/resources/chromadb_functions_chirho.zip \
     && mv /home/jupyter/chromadb_functions /home/jupyter/chromadb_functions_chirho && ls
 
-RUN mkdir /home/jupyter/workspace
-WORKDIR /home/jupyter/workspace
+USER root
 
-CMD ["python", "-m", "beaker_kernel.server.main", "--ip", "0.0.0.0"]
+CMD ["python", "-m", "beaker_kernel.service.server"]

@@ -23,7 +23,7 @@ class ClimateDataUtilityToolset:
     """Toolset for ClimateDataUtility context"""
 
     @tool()
-    async def detect_resolution(self, filepath: str, geo_columns: object, agent: AgentRef) -> str:
+    async def detect_resolution(self, filepath: str, geo_columns: dict[str, str], agent: AgentRef) -> str:
         """
         This function should be used to detect the resolution of a dataset.
         This can be used if the user doesn't know the resolution or if you are regridding a dataset and don't know a starting resolution.
@@ -33,7 +33,7 @@ class ClimateDataUtilityToolset:
 
         Args:
             filepath (str): The filepath to the dataset to open.
-            geo_columns (object): The names of the geographical columns in the dataset. This is an optional argument for this tool.
+            geo_columns (dict): The names of the geographical columns in the dataset. This is an optional argument for this tool.
                 This is an object with the keys 'lat_column' and 'lon_column'.
                 The 'lat_column' key should have the name of the latitude column and the 'lon_column' key should have the name of the longitude column.
 

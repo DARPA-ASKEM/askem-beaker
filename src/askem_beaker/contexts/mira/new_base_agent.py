@@ -7,6 +7,7 @@ import typing
 from archytas.react import ReActAgent, Undefined
 from archytas.tool_utils import AgentRef, LoopControllerRef, tool
 from archytas.tool_utils import AgentRef, LoopControllerRef, ReactContextRef, tool
+from beaker_kernel.lib.agent import BeakerAgent
 from beaker_kernel.lib.utils import togglable_tool
 
 if typing.TYPE_CHECKING:
@@ -15,7 +16,7 @@ if typing.TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-class NewBaseAgent(ReActAgent):
+class NewBaseAgent(BeakerAgent):
 
     context: "BaseContext"
 
@@ -25,18 +26,17 @@ class NewBaseAgent(ReActAgent):
         tools: list = None,
         **kwargs,
     ):
-        self.context = context
-
-        self.context.beaker_kernel.debug(
+        context.beaker_kernel.debug(
             "init-agent",
             {
-                "debug": self.context.beaker_kernel.debug_enabled,
-                "verbose": self.context.beaker_kernel.verbose,
+                "debug": context.beaker_kernel.debug_enabled,
+                "verbose": context.beaker_kernel.verbose,
             },
         )
         super().__init__(
+            context=context,
             tools=tools,
-            verbose=self.context.beaker_kernel.verbose,
+            verbose=context.beaker_kernel.verbose,
             max_errors=5,
             spinner=None,
             rich_print=False,
