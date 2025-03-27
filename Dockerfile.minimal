@@ -39,7 +39,7 @@ WORKDIR /home/jupyter/mira
 RUN pip install --no-cache-dir /home/jupyter/mira/"[ode,tests,dkg-client,dkg-construct,sbml,docs]" && \
     rm -r /home/jupyter/mira
 
-# Install Gilda - Mira Dependency
+# Install Gilda - MIRA Dependency
 RUN pip install gilda==1.2.1
 
 # Install project requirements
