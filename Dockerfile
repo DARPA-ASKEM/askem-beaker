@@ -1,1 +1,1 @@
-Dockerfile.light
+Dockerfile.minimal
