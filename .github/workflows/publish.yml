@@ -47,7 +47,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: Dockerfile.light
+          file: Dockerfile
           platforms: linux/amd64
           push: true
           tags: ${{ needs.image-tag.outputs.tagged-image-name }}--amd64
@@ -73,7 +73,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: Dockerfile.light
+          file: Dockerfile
           platforms: linux/arm64
           push: true
           tags: ${{ needs.image-tag.outputs.tagged-image-name }}--arm64
